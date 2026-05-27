@@ -1,0 +1,3509 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        />
+        <title>小人国奇遇记</title>
+        <meta name="application-name" content="小人国奇遇记" />
+        <meta name="theme-color" content="#ff69b4" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
+        <link rel="manifest" href="./public/manifest.json" />
+        <link rel="icon" href="./public/pwa-icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="./public/pwa-icon.svg" />
+        <link rel="stylesheet" href="./public/all.min.css" />
+        <style>
+            * {
+                box-sizing: border-box;
+                user-select: none;
+                -webkit-user-select: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            /* 参考风格：渐变背景 + 半透明卡片 */
+            html,
+            body {
+                margin: 0;
+                height: 100%;
+                overflow: hidden;
+            }
+            body {
+                height: 100vh;
+                background: linear-gradient(
+                    135deg,
+                    #fff9e6 0%,
+                    #e8f4fd 25%,
+                    #fff5f8 50%,
+                    #f0f8ff 75%,
+                    #fff0e6 100%
+                );
+                font-family: 'Nunito', 'Segoe UI', sans-serif;
+                display: flex;
+                flex-direction: column;
+                touch-action: pan-y;
+                position: relative;
+            }
+
+            /* 背景装饰层 */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="3" fill="%23FFD700" opacity="0.3"/><circle cx="80" cy="30" r="2" fill="%23FF69B4" opacity="0.3"/><circle cx="50" cy="60" r="4" fill="%2387CEEB" opacity="0.2"/><circle cx="90" cy="80" r="2" fill="%23FFD700" opacity="0.3"/><circle cx="10" cy="70" r="3" fill="%23FFB6C1" opacity="0.3"/><polygon points="30,10 33,16 40,16 35,20 37,27 30,23 23,27 25,20 20,16 27,16" fill="%23FFD700" opacity="0.2"/><polygon points="70,50 72,54 77,54 73,57 75,62 70,59 65,62 67,57 63,54 68,54" fill="%23FF69B4" opacity="0.2"/></svg>');
+                background-size: 200px 200px;
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.6;
+            }
+
+            /* 顶部标题栏 - 白色半透明卡片 */
+            .header {
+                background: rgba(255, 255, 255, 0.92);
+                color: #ff69b4;
+                padding: 8px 20px;
+                box-shadow: 0 8px 32px rgba(255, 105, 180, 0.15);
+                border-radius: 0 0 24px 24px;
+                display: flex;
+                align-items: center;
+                justify-content: stretch;
+                position: relative;
+                overflow: visible;
+                border: 2px solid rgba(255, 182, 193, 0.5);
+                border-top: none;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                z-index: 100;
+                flex-shrink: 0;
+                min-height: 52px;
+                height: auto;
+                flex-wrap: wrap;
+                box-sizing: border-box;
+            }
+
+            .header-buttons {
+                display: flex;
+                align-items: center;
+                flex-wrap: nowrap;
+                justify-content: center;
+                width: 100%;
+                min-width: 0;
+            }
+            .header-slot-left,
+            .header-slot-right {
+                flex: 1 1 0;
+                min-width: 0;
+                display: flex;
+                align-items: center;
+            }
+            .header-slot-left {
+                justify-content: flex-start;
+            }
+            .header-slot-right {
+                justify-content: flex-end;
+            }
+            .header-slot-left > *,
+            .header-slot-right > * {
+                margin: 3px;
+            }
+            .header-tools {
+                flex: 0 0 auto;
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin: -3px;
+            }
+            .header-tools > * {
+                margin: 3px;
+            }
+
+            .header-buttons-inline {
+                display: inline-flex;
+                align-items: center;
+                flex-wrap: wrap;
+                justify-content: center;
+                vertical-align: middle;
+                margin: -3px;
+            }
+            .header-buttons-inline > * {
+                margin: 3px;
+            }
+
+            .header-buttons-inline {
+                margin-left: 0;
+            }
+
+            /* 头部按钮 - 彩色渐变风格 */
+            .header-btn {
+                border: none;
+                border-radius: 50%;
+                width: 44px;
+                height: 44px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+                position: relative;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            }
+            .header-btn:hover {
+                transform: translateY(-2px);
+            }
+            .header-btn:active {
+                transform: translateY(0);
+            }
+            .header-btn i {
+                font-size: 16px;
+                color: white;
+            }
+
+            #saveBtnHeader,
+            #clearBtn {
+                background: linear-gradient(145deg, #74b9ff 0%, #0984e3 100%);
+            }
+            #saveBtnHeader {
+                width: 36px;
+                height: 36px;
+                box-shadow: 0 2px 8px rgba(9, 132, 227, 0.28);
+            }
+            #saveBtnHeader i {
+                font-size: 14px;
+            }
+            #recordBtnHeader {
+                width: 36px;
+                height: 36px;
+                background: linear-gradient(145deg, #a29bfe 0%, #6c5ce7 100%);
+                box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
+            }
+            #recordBtnHeader i {
+                font-size: 14px;
+            }
+            #recordBtnHeader.recording {
+                background: linear-gradient(145deg, #ff7675 0%, #d63031 100%);
+                box-shadow: 0 0 0 3px rgba(214, 48, 49, 0.35);
+                animation: recordPulse 1.2s ease-in-out infinite;
+            }
+            @keyframes recordPulse {
+                0%,
+                100% {
+                    transform: translateY(0) scale(1);
+                }
+                50% {
+                    transform: translateY(0) scale(1.05);
+                }
+            }
+            #eraserBtn {
+                background: linear-gradient(145deg, #a8d8ff 0%, #74b9ff 100%);
+            }
+            #deleteBtn {
+                background: linear-gradient(145deg, #a8e6cf 0%, #55efc4 100%);
+            }
+            #clearBtn {
+                background: linear-gradient(145deg, #ffb8b8 0%, #ff7675 100%);
+            }
+            #eraserBtn i,
+            #deleteBtn i,
+            #clearBtn i,
+            #undoBtn i {
+                color: white;
+                outline: none;
+                box-shadow: none;
+            }
+            #videoBtnHeader {
+                background: linear-gradient(145deg, #ff7675 0%, #d63031 100%);
+            }
+
+            /* 中间区域 - 物品栏 + 画布 */
+            .middle-area {
+                flex: 1;
+                display: flex;
+                padding: 12px;
+                min-height: 0;
+                position: relative;
+                z-index: 1;
+            }
+            .middle-area > * + * {
+                margin-left: 12px;
+            }
+
+            /* 左侧物品栏 - 白色半透明卡片风格 */
+            .toolbar-left {
+                width: 140px;
+                min-width: 140px;
+                max-width: 140px;
+                background: rgba(255, 255, 255, 0.92);
+                box-shadow: 0 8px 32px rgba(255, 105, 180, 0.2);
+                display: flex;
+                flex-direction: column;
+                padding: 15px 10px;
+                border-radius: 24px;
+                border: 2px solid rgba(255, 182, 193, 0.5);
+                z-index: 10;
+                overflow-y: auto;
+                flex-shrink: 0;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            .toolbar-left > * + * {
+                margin-top: 10px;
+            }
+            .toolbar-left::-webkit-scrollbar {
+                display: none;
+            }
+
+            .toolbar-left .sidebar-bg-category .mat-btn.active {
+                border-color: #0984e3;
+                box-shadow: 0 0 0 2px rgba(9, 132, 227, 0.25);
+            }
+            .sidebar-bg-category .bg-mat-swatch {
+                display: block;
+                width: 48px;
+                height: 48px;
+                border-radius: 10px;
+                border: 1px solid rgba(0, 0, 0, 0.08);
+                box-sizing: border-box;
+            }
+
+            .material-panel {
+                display: flex;
+                flex-direction: column;
+            }
+            .material-panel > * + * {
+                margin-top: 8px;
+            }
+            .category {
+                display: flex;
+                flex-direction: column;
+            }
+            .category > * + * {
+                margin-top: 6px;
+            }
+
+            /* 分类标题 */
+            .category-title {
+                font-size: 11px;
+                font-weight: 700;
+                background: linear-gradient(135deg, #fff 0%, #fff5f8 100%);
+                padding: 6px 8px;
+                border-radius: 12px;
+                text-align: center;
+                border: 2px solid #ffd4e5;
+                cursor: pointer;
+                user-select: none;
+                -webkit-user-select: none;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 3px 10px rgba(255, 105, 180, 0.12);
+                color: #ff69b4;
+            }
+            .category-title > * + * {
+                margin-left: 4px;
+            }
+            .category-title:hover {
+                background: linear-gradient(135deg, #ffd4e5 0%, #ffe4ee 100%);
+                transform: translateY(-1px);
+            }
+            .category-title.collapsed {
+                background: linear-gradient(135deg, #ffd4e5 0%, #ffe4ee 100%);
+            }
+            .category-title i {
+                font-size: 12px;
+            }
+
+            /* 物品分类标题 */
+            .category-title {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                cursor: pointer;
+                user-select: none;
+                padding: 8px 10px;
+                background: linear-gradient(135deg, #ffe4ec 0%, #fff0f5 100%);
+                border-radius: 10px;
+                margin-bottom: 8px;
+                transition: background 0.2s ease, box-shadow 0.2s ease,
+                    transform 0.2s ease;
+                -webkit-user-select: none;
+            }
+
+            .category-title:hover {
+                background: linear-gradient(135deg, #ffd6e4 0%, #ffe8f0 100%);
+            }
+
+            .category-title i:first-child {
+                margin-right: 8px;
+            }
+
+            .collapse-icon {
+                font-size: 12px;
+                transition: transform 0.3s ease;
+                color: #e91e63;
+            }
+
+            .category-title.expanded .collapse-icon {
+                transform: rotate(180deg);
+            }
+
+            /* 物品按钮 */
+            .category-items {
+                display: none;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                justify-items: center;
+                padding: 5px 0;
+                contain: layout style;
+            }
+            .category-items.show {
+                display: grid;
+            }
+
+            .mat-btn {
+                background: linear-gradient(145deg, #ffffff 0%, #fff8fa 100%);
+                border: 2px solid rgba(255, 182, 193, 0.5);
+                border-radius: 14px;
+                padding: 3px;
+                box-shadow: 0 3px 10px rgba(255, 105, 180, 0.12);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                width: 56px;
+                height: 56px;
+                transition: transform 0.2s ease, box-shadow 0.2s ease,
+                    border-color 0.2s ease;
+            }
+            .mat-btn img {
+                width: 48px;
+                height: 48px;
+                object-fit: contain;
+                border-radius: 10px;
+                background: #f5f5f5;
+            }
+            .mat-btn:hover {
+                transform: translateY(-2px) scale(1.05);
+                box-shadow: 0 6px 16px rgba(255, 105, 180, 0.2);
+                border-color: #ff69b4;
+            }
+
+            /* 变体选择面板 */
+            .variants-panel {
+                position: fixed;
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(15px);
+                -webkit-backdrop-filter: blur(15px);
+                border-radius: 16px;
+                box-shadow: 0 8px 32px rgba(255, 105, 180, 0.25);
+                padding: 12px;
+                z-index: 1000;
+                min-width: 200px;
+                animation: fadeIn 0.2s ease;
+            }
+
+            .variants-title {
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 10px;
+                text-align: center;
+                padding-bottom: 8px;
+                border-bottom: 1px solid rgba(255, 105, 180, 0.2);
+            }
+
+            .variants-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .variant-btn {
+                width: 60px;
+                height: 60px;
+                border: 2px solid transparent;
+                border-radius: 10px;
+                background: #f8f8f8;
+                cursor: pointer;
+                overflow: hidden;
+                transition: all 0.2s ease;
+                padding: 4px;
+            }
+
+            .variant-btn img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+
+            .variant-btn:hover {
+                transform: scale(1.1);
+                border-color: #ff69b4;
+                box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-5px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            .mat-btn:active {
+                transform: translateY(0) scale(0.98);
+            }
+
+            /* 画布区域 */
+            .scene-wrapper {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 0;
+                overflow: visible;
+            }
+            #scene {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                border-radius: 28px;
+                background: rgba(255, 255, 255, 0.95);
+                box-shadow: 0 10px 40px rgba(255, 105, 180, 0.15),
+                    inset 0 0 0 3px rgba(255, 182, 193, 0.3);
+                border: 3px solid rgba(255, 182, 193, 0.5);
+                overflow: hidden;
+                touch-action: none;
+                cursor: none;
+                backdrop-filter: blur(5px);
+                -webkit-backdrop-filter: blur(5px);
+            }
+            #bgCanvas,
+            #drawCanvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            #bgCanvas {
+                z-index: 1;
+                pointer-events: none;
+            }
+            #itemsLayer {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 3;
+            }
+            #drawCanvas {
+                z-index: 4;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+
+            /* 可拖拽物品 */
+            .draggable {
+                position: absolute;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 300px;
+                height: 300px;
+                background: transparent;
+                border: none;
+                transform-origin: center;
+                filter: drop-shadow(0 4px 8px rgba(255, 105, 180, 0.2));
+                pointer-events: auto;
+                z-index: 5;
+                touch-action: none;
+                will-change: transform; /* 提升触摸性能 */
+            }
+            .draggable img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                pointer-events: none;
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: high-quality;
+            }
+            /* 儿童：尺寸由 JS 按原图比例设定；避免强 filter / 对比度算法导致发糊 */
+            .draggable[data-type='kid'] {
+                box-sizing: border-box;
+                filter: drop-shadow(0 2px 8px rgba(255, 105, 180, 0.2));
+            }
+            .draggable[data-type='kid'] img {
+                image-rendering: auto;
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+            /* 选中描边：drop-shadow 沿子元素（含透明底图）的非透明边缘，而非整块 300×300 矩形 */
+            .draggable.selected {
+                outline: none;
+                filter: drop-shadow(1px 0 0 #ff1493)
+                    drop-shadow(-1px 0 0 #ff1493) drop-shadow(0 1px 0 #ff1493)
+                    drop-shadow(0 -1px 0 #ff1493) drop-shadow(1px 1px 0 #ff1493)
+                    drop-shadow(-1px 1px 0 #ff1493)
+                    drop-shadow(1px -1px 0 #ff1493)
+                    drop-shadow(-1px -1px 0 #ff1493)
+                    drop-shadow(0 4px 8px rgba(255, 105, 180, 0.22));
+            }
+            .draggable[data-type='kid'].selected {
+                filter: drop-shadow(1px 0 0 #ff1493)
+                    drop-shadow(-1px 0 0 #ff1493) drop-shadow(0 1px 0 #ff1493)
+                    drop-shadow(0 -1px 0 #ff1493) drop-shadow(1px 1px 0 #ff1493)
+                    drop-shadow(-1px 1px 0 #ff1493)
+                    drop-shadow(1px -1px 0 #ff1493)
+                    drop-shadow(-1px -1px 0 #ff1493)
+                    drop-shadow(0 2px 8px rgba(255, 105, 180, 0.22));
+            }
+            .img-spinner {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 24px;
+                height: 24px;
+                margin: -12px 0 0 -12px;
+                border: 3px solid rgba(255, 182, 193, 0.3);
+                border-top-color: #ff69b4;
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+                pointer-events: none;
+            }
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* 自定义光标 */
+            #customCursor {
+                position: fixed;
+                pointer-events: none;
+                z-index: 1000;
+                display: none;
+                width: 12px;
+                height: 12px;
+                background: linear-gradient(145deg, #ff69b4 0%, #ff1493 100%);
+                border-radius: 50%;
+                border: 2px solid white;
+                box-shadow: 0 2px 10px rgba(255, 20, 147, 0.4);
+                transform: translate(-50%, -50%);
+            }
+            #customCursor.eraser-mode {
+                width: 24px;
+                height: 24px;
+                background: linear-gradient(145deg, #fff 0%, #fff5f8 100%);
+                border: 3px solid #ffb6c1;
+                border-radius: 6px;
+            }
+
+            /* 底部工具栏 - 毛玻璃卡片 */
+            .bottom-toolbar {
+                background: rgba(255, 255, 255, 0.92);
+                box-shadow: 0 -8px 32px rgba(255, 105, 180, 0.15);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 8px 20px;
+                border-top: 2px solid rgba(255, 182, 193, 0.5);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                flex-shrink: 0;
+                position: relative;
+                z-index: 100;
+                flex-wrap: wrap;
+                height: 60px;
+                box-sizing: border-box;
+                margin: -6px;
+            }
+            .bottom-toolbar > * {
+                margin: 6px;
+            }
+
+            /* 工具按钮 - 清晰图标 */
+            .tool-btn {
+                background: linear-gradient(145deg, #ffffff 0%, #fff8fa 100%);
+                border: none;
+                border-radius: 50%;
+                padding: 0;
+                box-shadow: 0 2px 8px rgba(255, 105, 180, 0.15);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                width: 44px;
+                height: 44px;
+                transition: all 0.2s;
+                color: #ff69b4;
+                font-size: 14px;
+            }
+            .tool-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(255, 105, 180, 0.25);
+                border-color: #ff69b4;
+            }
+            .tool-btn:active {
+                transform: translateY(0);
+            }
+            .tool-btn.active {
+                background: linear-gradient(145deg, #ffb6c1 0%, #ff69b4 100%);
+                border-color: #ff69b4;
+                box-shadow: 0 4px 12px rgba(255, 105, 180, 0.4);
+                color: white;
+            }
+            .tool-btn.warning {
+                background: linear-gradient(145deg, #ffe4ec 0%, #ffd4e5 100%);
+                border-color: rgba(255, 182, 193, 0.7);
+            }
+            .tool-btn i {
+                font-size: 22px;
+            }
+            .tool-btn.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+            .tool-btn.disabled:hover {
+                transform: none;
+                box-shadow: 0 4px 15px rgba(255, 105, 180, 0.15);
+            }
+
+            /* 粗细选择器 */
+            .size-selector {
+                display: flex;
+                align-items: center;
+                background: rgba(255, 255, 255, 0.9);
+                padding: 4px 8px;
+                border-radius: 20px;
+                box-shadow: 0 2px 8px rgba(255, 105, 180, 0.1);
+                border: 2px solid rgba(255, 182, 193, 0.4);
+            }
+            .size-selector > * + * {
+                margin-left: 4px;
+            }
+            .size-btn {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: linear-gradient(145deg, #fff 0%, #fff5f8 100%);
+                border: 2px solid rgba(255, 182, 193, 0.5);
+                box-shadow: 0 2px 6px rgba(255, 105, 180, 0.12);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+            }
+            .size-btn:hover {
+                transform: scale(1.1);
+            }
+            .size-btn.active {
+                background: linear-gradient(145deg, #ffb6c1 0%, #ff69b4 100%);
+                border-color: #ff69b4;
+                box-shadow: 0 3px 10px rgba(255, 105, 180, 0.4);
+            }
+            .size-dot {
+                background: #e91e63;
+                border-radius: 50%;
+            }
+
+            /* 画笔下拉菜单 */
+            .brush-dropdown {
+                position: relative;
+            }
+            .brush-dropdown .dropdown-arrow {
+                font-size: 8px;
+                margin-left: 2px;
+            }
+            .brush-dropdown-content {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background: white;
+                border-radius: 16px;
+                padding: 12px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+                min-width: 200px;
+            }
+            .brush-dropdown-content.show,
+            .brush-dropdown-content.show {
+                display: block;
+            }
+
+            .dropdown-section {
+                margin-bottom: 12px;
+            }
+            .dropdown-section:last-child {
+                margin-bottom: 0;
+            }
+            .dropdown-label {
+                font-size: 11px;
+                color: #888;
+                margin-bottom: 8px;
+                font-weight: 500;
+            }
+            .color-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+            .color-swatch {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+                border: 2px solid transparent;
+            }
+            .color-swatch:hover {
+                transform: scale(1.1);
+            }
+            .color-swatch.active {
+                border-color: #ff69b4;
+                box-shadow: 0 0 0 2px white, 0 0 0 4px #ff69b4;
+            }
+            .size-options {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .size-options > * + * {
+                margin-left: 12px;
+            }
+            .size-options .size-btn {
+                width: 40px;
+                height: 40px;
+                border-radius: 8px;
+            }
+
+            /* 语音讲解区域 */
+            .voice-section {
+                background: linear-gradient(135deg, #e8f4fd 0%, #f0f7ff 100%);
+                border-radius: 16px;
+                padding: 16px;
+                margin-bottom: 16px;
+                border: 2px solid rgba(100, 181, 246, 0.3);
+            }
+            .voice-section h3 {
+                color: #1976d2;
+                margin: 0 0 10px;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+            }
+            .voice-section h3 > * + * {
+                margin-left: 6px;
+            }
+            .voice-section textarea {
+                width: 100%;
+                padding: 12px;
+                border-radius: 10px;
+                border: 2px solid #90caf9;
+                font-size: 13px;
+                resize: vertical;
+                min-height: 60px;
+                margin-bottom: 10px;
+                font-family: inherit;
+                box-sizing: border-box;
+            }
+            .voice-section textarea:focus {
+                outline: none;
+                border-color: #1976d2;
+            }
+            .voice-controls {
+                display: flex;
+                align-items: center;
+            }
+            .voice-controls > * + * {
+                margin-left: 10px;
+            }
+            .voice-controls select {
+                flex: 1;
+                padding: 8px;
+                border-radius: 8px;
+                border: 2px solid #90caf9;
+                font-size: 13px;
+                background: white;
+            }
+            .voice-controls select:focus {
+                outline: none;
+                border-color: #1976d2;
+            }
+            .voice-btn {
+                padding: 8px 16px;
+                border-radius: 20px;
+                border: none;
+                background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+                color: white;
+                font-size: 13px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                transition: all 0.2s;
+            }
+            .voice-btn > * + * {
+                margin-left: 6px;
+            }
+            .voice-btn:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+            }
+            .voice-preview audio {
+                width: 100%;
+                margin-top: 10px;
+                border-radius: 8px;
+            }
+
+            /* 上传按钮 */
+            .upload-btn {
+                padding: 10px 20px;
+                border-radius: 20px;
+                border: 2px dashed #90caf9;
+                background: white;
+                color: #1976d2;
+                font-size: 14px;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                transition: all 0.2s;
+            }
+            .upload-btn > * + * {
+                margin-left: 8px;
+            }
+            .upload-btn:hover {
+                background: #e3f2fd;
+                border-color: #1976d2;
+            }
+            .upload-btn input {
+                display: none;
+            }
+
+            /* 老浏览器 backdrop-filter fallback */
+            @supports not (backdrop-filter: blur(1px)) {
+                .header,
+                .toolbar-left,
+                .bottom-toolbar {
+                    background: rgba(255, 255, 255, 0.96);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- 顶部按钮栏 -->
+        <div class="header">
+            <div class="header-buttons">
+                <div class="header-slot-left"></div>
+                <div class="header-tools">
+                    <div class="brush-dropdown">
+                        <button
+                            class="tool-btn active"
+                            id="brushBtn"
+                            title="画笔"
+                        >
+                            <i class="fas fa-pen"></i>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div
+                            id="brushDropdownContent"
+                            class="brush-dropdown-content"
+                        >
+                            <div class="dropdown-section">
+                                <div class="dropdown-label">颜色</div>
+                                <div class="color-grid">
+                                    <div
+                                        class="color-swatch active"
+                                        data-color="#000000"
+                                        style="background: #000000"
+                                        title="黑色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#FF0000"
+                                        style="background: #ff0000"
+                                        title="红色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#FF6600"
+                                        style="background: #ff6600"
+                                        title="橙色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#FFFF00"
+                                        style="background: #ffff00"
+                                        title="黄色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#00FF00"
+                                        style="background: #00ff00"
+                                        title="绿色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#00FFFF"
+                                        style="background: #00ffff"
+                                        title="青色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#0000FF"
+                                        style="background: #0000ff"
+                                        title="蓝色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#FF00FF"
+                                        style="background: #ff00ff"
+                                        title="紫色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#FF69B4"
+                                        style="background: #ff69b4"
+                                        title="粉色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#8B4513"
+                                        style="background: #8b4513"
+                                        title="棕色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#FFFFFF"
+                                        style="
+                                            background: #ffffff;
+                                            border: 1px solid #ccc;
+                                        "
+                                        title="白色"
+                                    ></div>
+                                    <div
+                                        class="color-swatch"
+                                        data-color="#808080"
+                                        style="background: #808080"
+                                        title="灰色"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div class="dropdown-section">
+                                <div class="dropdown-label">粗细</div>
+                                <div class="size-options">
+                                    <div class="size-btn" data-size="2">
+                                        <div
+                                            class="size-dot"
+                                            style="width: 4px; height: 4px"
+                                        ></div>
+                                    </div>
+                                    <div class="size-btn active" data-size="6">
+                                        <div
+                                            class="size-dot"
+                                            style="width: 8px; height: 8px"
+                                        ></div>
+                                    </div>
+                                    <div class="size-btn" data-size="12">
+                                        <div
+                                            class="size-dot"
+                                            style="width: 14px; height: 14px"
+                                        ></div>
+                                    </div>
+                                    <div class="size-btn" data-size="20">
+                                        <div
+                                            class="size-dot"
+                                            style="width: 20px; height: 20px"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="brush-dropdown eraser-dropdown">
+                        <button class="tool-btn" id="eraserBtn" title="橡皮擦">
+                            <i class="fas fa-eraser"></i>
+                        </button>
+                        <div
+                            id="eraserDropdownContent"
+                            class="brush-dropdown-content"
+                        >
+                            <div class="dropdown-section">
+                                <div class="dropdown-label">橡皮大小</div>
+                                <div class="size-options">
+                                    <div
+                                        class="size-btn eraser-size-btn"
+                                        data-size="12"
+                                        title="小"
+                                    >
+                                        <div
+                                            class="size-dot"
+                                            style="width: 10px; height: 10px"
+                                        ></div>
+                                    </div>
+                                    <div
+                                        class="size-btn eraser-size-btn active"
+                                        data-size="20"
+                                        title="中"
+                                    >
+                                        <div
+                                            class="size-dot"
+                                            style="width: 14px; height: 14px"
+                                        ></div>
+                                    </div>
+                                    <div
+                                        class="size-btn eraser-size-btn"
+                                        data-size="32"
+                                        title="大"
+                                    >
+                                        <div
+                                            class="size-dot"
+                                            style="width: 18px; height: 18px"
+                                        ></div>
+                                    </div>
+                                    <div
+                                        class="size-btn eraser-size-btn"
+                                        data-size="48"
+                                        title="特大"
+                                    >
+                                        <div
+                                            class="size-dot"
+                                            style="width: 22px; height: 22px"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <button
+                    class="tool-btn"
+                    id="undoBtn"
+                    title="撤销一步"
+                    style="
+                        background: linear-gradient(
+                            145deg,
+                            #ffdde4 0%,
+                            #ffb6c1 100%
+                        );
+                    "
+                >
+                    <i class="fas fa-undo-alt"></i>
+                </button> -->
+                    <button
+                        class="tool-btn warning"
+                        id="deleteBtn"
+                        title="删除"
+                    >
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <!-- <button class="tool-btn warning" id="clearBtn" title="清空">
+                    <i class="fas fa-times"></i>
+                </button> -->
+                </div>
+                <div class="header-slot-right">
+                    <button
+                        class="header-btn"
+                        id="recordBtnHeader"
+                        type="button"
+                        title="视频录制"
+                    >
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="header-btn" id="saveBtnHeader" title="保存">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中间区域 -->
+        <div class="middle-area">
+            <!-- 左侧物品栏 -->
+            <div class="toolbar-left">
+                <div class="category sidebar-bg-category">
+                    <div
+                        class="category-title expanded"
+                        id="bgCategoryTitle"
+                        data-sidebar-bg-toggle="1"
+                    >
+                        <i class="fas fa-image"></i>
+                        背景
+                        <i class="fas fa-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="category-items show" id="bgCategoryItems">
+                        <button
+                            type="button"
+                            class="mat-btn active"
+                            data-bg="cream"
+                            title="奶油白（默认）"
+                        >
+                            <span
+                                class="bg-mat-swatch"
+                                style="background: #fff8f0"
+                            ></span>
+                        </button>
+                        <button
+                            type="button"
+                            class="mat-btn"
+                            data-bg="bg1"
+                            title="背景 1"
+                        >
+                            <img
+                                src="./public/background/背景1.webp"
+                                alt="背景1"
+                                width="48"
+                                height="48"
+                                decoding="async"
+                                loading="lazy"
+                            />
+                        </button>
+                        <button
+                            type="button"
+                            class="mat-btn"
+                            data-bg="bg2"
+                            title="背景 2"
+                        >
+                            <img
+                                src="./public/background/背景2.webp"
+                                alt="背景2"
+                                width="48"
+                                height="48"
+                                decoding="async"
+                                loading="lazy"
+                            />
+                        </button>
+                        <button
+                            type="button"
+                            class="mat-btn"
+                            data-bg="bg3"
+                            title="背景 3"
+                        >
+                            <img
+                                src="./public/background/背景3.webp"
+                                alt="背景3"
+                                width="48"
+                                height="48"
+                                decoding="async"
+                                loading="lazy"
+                            />
+                        </button>
+                        <button
+                            type="button"
+                            class="mat-btn"
+                            data-bg="pic4"
+                            title="图片 4"
+                        >
+                            <img
+                                src="./public/background/图片4.webp"
+                                alt="图片4"
+                                width="48"
+                                height="48"
+                                decoding="async"
+                                loading="lazy"
+                            />
+                        </button>
+                    </div>
+                </div>
+                <div class="material-panel" id="itemsContainer">
+                    <!-- 物品由 JavaScript 动态生成 -->
+                </div>
+            </div>
+
+            <!-- 画布区域 -->
+            <div class="scene-wrapper">
+                <div id="scene">
+                    <canvas id="bgCanvas"></canvas>
+                    <div id="itemsLayer"></div>
+                    <canvas id="drawCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="customCursor"></div>
+
+        <script>
+            ;(function () {
+                'use strict'
+                // ---------- DOM ----------
+                const scene = document.getElementById('scene')
+                const bgCanvas = document.getElementById('bgCanvas')
+                const drawCanvas = document.getElementById('drawCanvas')
+                const itemsLayer = document.getElementById('itemsLayer')
+                const ctx = drawCanvas.getContext('2d')
+                const bgCtx = bgCanvas.getContext('2d')
+                const cursorDiv = document.getElementById('customCursor')
+
+                // 背景：默认奶油白；其余为 public/background 下的图
+                const bgColors = {
+                    cream: { type: 'color', value: '#FFF8F0', name: '奶油白' },
+                    bg1: {
+                        type: 'image',
+                        value: './public/background/背景1.webp',
+                        name: '背景1',
+                    },
+                    bg2: {
+                        type: 'image',
+                        value: './public/background/背景2.webp',
+                        name: '背景2',
+                    },
+                    bg3: {
+                        type: 'image',
+                        value: './public/background/背景3.webp',
+                        name: '背景3',
+                    },
+                    pic4: {
+                        type: 'image',
+                        value: './public/background/图片4.webp',
+                        name: '图片4',
+                    },
+                }
+                let currentBg = 'cream'
+
+                // 状态
+                let currentSelected = null
+                let drawingEnabled = false
+                let eraserEnabled = false
+                let isDrawing = false
+                let isDrawingFromTouch = false
+                let brushSize = 6
+                let eraserSize = 20
+                let brushColor = '#000000' // 修复Bug: 添加画笔颜色状态变量
+                let sceneHistory = [] // 撤销历史记录（保存完整场景）
+                const maxHistorySize = 20 // 最多保存20步历史
+                const SCALE_MAX = 40.0
+                const SCALE_MIN = 0.2
+                /** 素材栏缩略图占位，避免折叠时加载全部 webp 导致点击分类卡顿 */
+                const THUMB_PLACEHOLDER =
+                    'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+
+                // 光标 RAF
+                let cursorX = 0,
+                    cursorY = 0
+                let rafPending = false
+                function updateCursorNow() {
+                    cursorDiv.style.left = cursorX + 'px'
+                    cursorDiv.style.top = cursorY + 'px'
+                    rafPending = false
+                }
+                function setCursorPos(x, y) {
+                    cursorX = x
+                    cursorY = y
+                    if (!rafPending) {
+                        rafPending = true
+                        requestAnimationFrame(updateCursorNow)
+                    }
+                }
+
+                // ========== 初始化 ==========
+                function onAppReady() {
+                    preloadBgImages()
+                    renderItemsPanel()
+                    setBackground('cream')
+                    resizeCanvas()
+                    bindUI()
+                }
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', onAppReady)
+                } else {
+                    onAppReady()
+                }
+
+                // 绘制背景 - 手绘纸张效果
+                const bgImageCache = {}
+
+                function drawBackground() {
+                    const dpr = window.devicePixelRatio || 1
+                    const w = bgCanvas.width / dpr
+                    const h = bgCanvas.height / dpr
+                    if (w <= 0 || h <= 0) return
+
+                    const bg = bgColors[currentBg]
+                    if (!bg) {
+                        currentBg = 'cream'
+                        return drawBackground()
+                    }
+                    if (bg.type === 'image') {
+                        const cached = bgImageCache[currentBg]
+                        if (cached) {
+                            const img = cached
+                            const iw = img.naturalWidth || img.width || 1
+                            const ih = img.naturalHeight || img.height || 1
+                            // cover：宽高都铺满画布（等比缩放，超出由画布裁切）
+                            const scale = Math.max(w / iw, h / ih)
+                            const imgW = iw * scale
+                            const imgH = ih * scale
+                            const x = (w - imgW) / 2
+                            const y = (h - imgH) / 2
+                            bgCtx.drawImage(img, 0, 0, iw, ih, x, y, imgW, imgH)
+                        } else {
+                            bgCtx.fillStyle = '#87CEEB'
+                            bgCtx.fillRect(0, 0, w, h)
+                        }
+                        return
+                    }
+
+                    // 颜色背景
+                    bgCtx.fillStyle = bg.value
+                    bgCtx.fillRect(0, 0, w, h)
+
+                    // 纹理与网格在设备像素位图上处理，避免与 scale(dpr) 错位
+                    bgCtx.save()
+                    bgCtx.setTransform(1, 0, 0, 1, 0, 0)
+                    const bw = bgCanvas.width
+                    const bh = bgCanvas.height
+                    const imageData = bgCtx.getImageData(0, 0, bw, bh)
+                    const data = imageData.data
+                    for (let i = 0; i < data.length; i += 4) {
+                        const noise = (Math.random() - 0.5) * 15
+                        data[i] = Math.max(0, Math.min(255, data[i] + noise))
+                        data[i + 1] = Math.max(
+                            0,
+                            Math.min(255, data[i + 1] + noise)
+                        )
+                        data[i + 2] = Math.max(
+                            0,
+                            Math.min(255, data[i + 2] + noise)
+                        )
+                    }
+                    bgCtx.putImageData(imageData, 0, 0)
+                    bgCtx.restore()
+
+                    bgCtx.strokeStyle = 'rgba(180, 160, 140, 0.15)'
+                    bgCtx.lineWidth = 0.5
+
+                    for (let y = 40; y < h; y += 40) {
+                        bgCtx.beginPath()
+                        let x = 0
+                        bgCtx.moveTo(x, y + (Math.random() - 0.5) * 2)
+                        while (x < w) {
+                            x += 20
+                            bgCtx.lineTo(x, y + (Math.random() - 0.5) * 2)
+                        }
+                        bgCtx.stroke()
+                    }
+
+                    for (let x = 40; x < w; x += 40) {
+                        bgCtx.beginPath()
+                        let y = 0
+                        bgCtx.moveTo(x + (Math.random() - 0.5) * 2, y)
+                        while (y < h) {
+                            y += 20
+                            bgCtx.lineTo(x + (Math.random() - 0.5) * 2, y)
+                        }
+                        bgCtx.stroke()
+                    }
+
+                    const gradient = bgCtx.createRadialGradient(
+                        w / 2,
+                        h / 2,
+                        0,
+                        w / 2,
+                        h / 2,
+                        Math.max(w, h) * 0.7
+                    )
+                    gradient.addColorStop(0, 'rgba(0,0,0,0)')
+                    gradient.addColorStop(1, 'rgba(0,0,0,0.08)')
+                    bgCtx.fillStyle = gradient
+                    bgCtx.fillRect(0, 0, w, h)
+                }
+
+                // 预加载背景图片
+                function preloadBgImages() {
+                    for (const [key, bg] of Object.entries(bgColors)) {
+                        if (bg.type === 'image') {
+                            const img = new Image()
+                            img.onload = () => {
+                                bgImageCache[key] = img
+                            }
+                            img.src = bg.value
+                        }
+                    }
+                }
+
+                // 切换背景
+                function setBackground(bgKey) {
+                    if (!bgColors[bgKey]) return
+                    currentBg = bgKey
+                    drawBackground()
+                    document
+                        .querySelectorAll(
+                            '.sidebar-bg-category .mat-btn[data-bg]'
+                        )
+                        .forEach((btn) => {
+                            btn.classList.toggle(
+                                'active',
+                                btn.dataset.bg === bgKey
+                            )
+                        })
+                }
+
+                /** 场景内容区 CSS 尺寸：与绝对定位子节点、笔迹命中一致（不含 #scene 边框） */
+                function getSceneLayoutCssSize() {
+                    return {
+                        w: Math.max(1, Math.round(scene.clientWidth)),
+                        h: Math.max(1, Math.round(scene.clientHeight)),
+                    }
+                }
+
+                function resizeCanvas() {
+                    const { w: cssWidth, h: cssHeight } =
+                        getSceneLayoutCssSize()
+
+                    // 高清屏 DPR
+                    const dpr = window.devicePixelRatio || 1
+
+                    // 保存原画布内容
+                    let drawImageData = null
+
+                    if (drawCanvas.width > 0 && drawCanvas.height > 0) {
+                        try {
+                            drawImageData = drawCanvas.toDataURL('image/png')
+                        } catch (e) {
+                            console.log('保存画布内容失败:', e)
+                        }
+                    }
+
+                    // 设置 CSS 尺寸
+                    bgCanvas.style.width = cssWidth + 'px'
+                    bgCanvas.style.height = cssHeight + 'px'
+
+                    drawCanvas.style.width = cssWidth + 'px'
+                    drawCanvas.style.height = cssHeight + 'px'
+
+                    // 设置真实像素尺寸
+                    bgCanvas.width = Math.round(cssWidth * dpr)
+                    bgCanvas.height = Math.round(cssHeight * dpr)
+
+                    drawCanvas.width = Math.round(cssWidth * dpr)
+                    drawCanvas.height = Math.round(cssHeight * dpr)
+
+                    // 重置 transform
+                    bgCtx.setTransform(1, 0, 0, 1, 0, 0)
+                    ctx.setTransform(1, 0, 0, 1, 0, 0)
+
+                    // DPR 缩放
+                    bgCtx.scale(dpr, dpr)
+                    ctx.scale(dpr, dpr)
+
+                    drawBackground()
+
+                    // 恢复绘画内容
+                    if (drawImageData) {
+                        const img = new Image()
+
+                        img.onload = () => {
+                            ctx.drawImage(img, 0, 0, cssWidth, cssHeight)
+                        }
+
+                        img.src = drawImageData
+                    }
+                }
+
+                let resizeTimer
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimer)
+                    resizeTimer = setTimeout(() => {
+                        resizeCanvas()
+                        clampAllItems()
+                    }, 100)
+                })
+
+                function clampAllItems() {
+                    document.querySelectorAll('.draggable').forEach((el) => {
+                        const { tx, ty, scale, rotate } = getTransform(el)
+                        const pos = clampPosition(el, tx, ty)
+                        setTransform(el, pos.x, pos.y, scale, rotate)
+                    })
+                }
+
+                // ========== 单物品锁定（dataset，非全局锁定）==========
+                function isLocked(el) {
+                    return el.dataset.locked === 'true'
+                }
+                function setLocked(el, locked) {
+                    el.dataset.locked = locked
+                    if (locked) el.classList.add('locked-by-mode')
+                    else el.classList.remove('locked-by-mode')
+                }
+
+                function setItemsLockedForMode(lock) {
+                    document.querySelectorAll('.draggable').forEach((el) => {
+                        if (!isLocked(el))
+                            el.classList.toggle('mode-locked', lock)
+                    })
+                }
+                function updateInteractionLock() {
+                    setItemsLockedForMode(drawingEnabled || eraserEnabled)
+                }
+
+                function getTransform(el) {
+                    if (el._tx === undefined) {
+                        el._tx = 0
+                        el._ty = 0
+                        el._scale = 1.0
+                        el._rotate = 0
+                    }
+                    return {
+                        tx: el._tx,
+                        ty: el._ty,
+                        scale: el._scale,
+                        rotate: el._rotate,
+                    }
+                }
+                // 缓存场景边界，减少DOM访问
+                let sceneBounds = null
+                let lastBoundsUpdate = 0
+
+                function setTransform(el, tx, ty, scale, rotate) {
+                    // 只在值变化时更新，减少重绘
+                    if (
+                        el._tx !== tx ||
+                        el._ty !== ty ||
+                        el._scale !== scale ||
+                        el._rotate !== rotate
+                    ) {
+                        el._tx = tx
+                        el._ty = ty
+                        el._scale = scale
+                        el._rotate = rotate
+                        el.style.transform = `translate(${Math.round(
+                            tx
+                        )}px, ${Math.round(
+                            ty
+                        )}px) scale(${scale}) rotate(${rotate}deg)`
+                    }
+                }
+                function clampPosition(el, tx, ty) {
+                    const now = Date.now()
+                    // 每100ms更新一次边界缓存
+                    if (now - lastBoundsUpdate > 100) {
+                        const s = getSceneLayoutCssSize()
+                        sceneBounds = { width: s.w, height: s.h }
+                        lastBoundsUpdate = now
+                    }
+                    const w = el.offsetWidth,
+                        h = el.offsetHeight
+                    return {
+                        x: Math.min(
+                            sceneBounds.width - w * 0.3,
+                            Math.max(-w * 0.7, tx)
+                        ),
+                        y: Math.min(
+                            sceneBounds.height - h * 0.3,
+                            Math.max(-h * 0.7, ty)
+                        ),
+                    }
+                }
+
+                /** 儿童贴图显示：取长边为基准放大，避免固定 70×100 过小发糊 */
+                const KID_DISPLAY_MAX_EDGE = 240
+                function applyKidDisplaySize(div, img) {
+                    const nw = img.naturalWidth
+                    const nh = img.naturalHeight
+                    if (nw <= 0 || nh <= 0) {
+                        div.style.width = '160px'
+                        div.style.height = '200px'
+                        return
+                    }
+                    let w, h
+                    if (nw >= nh) {
+                        w = KID_DISPLAY_MAX_EDGE
+                        h = Math.max(
+                            1,
+                            Math.round((KID_DISPLAY_MAX_EDGE * nh) / nw)
+                        )
+                    } else {
+                        h = KID_DISPLAY_MAX_EDGE
+                        w = Math.max(
+                            1,
+                            Math.round((KID_DISPLAY_MAX_EDGE * nw) / nh)
+                        )
+                    }
+                    div.style.width = w + 'px'
+                    div.style.height = h + 'px'
+                }
+
+                // ========== 创建物品 ==========
+                function createDraggable(
+                    type,
+                    imgUrl,
+                    saveState = true,
+                    onCreated = null
+                ) {
+                    const div = document.createElement('div')
+                    div.className = 'draggable'
+                    div.setAttribute('data-type', type)
+
+                    // 添加加载占位符
+                    const spinner = document.createElement('div')
+                    spinner.className = 'img-spinner'
+                    div.appendChild(spinner)
+
+                    const img = document.createElement('img')
+                    img.crossOrigin = 'anonymous'
+                    img.src = imgUrl
+                    img.alt = type
+                    img.draggable = false
+                    img.style.opacity = '0'
+                    img.style.transition = 'opacity 0.3s'
+                    div.appendChild(img)
+
+                    div.style.position = 'absolute'
+                    itemsLayer.appendChild(div)
+
+                    // 图片加载完成后，根据原始尺寸自适应容器大小（统一500x500）
+                    function adjustSize() {
+                        spinner.style.display = 'none'
+                        img.style.opacity = '1'
+                        if (type === 'kid') {
+                            applyKidDisplaySize(div, img)
+                            requestAnimationFrame(() => {
+                                const { w: sw, h: sh } = getSceneLayoutCssSize()
+                                const centerX = (sw - div.offsetWidth) / 2
+                                const centerY = (sh - div.offsetHeight) / 2
+                                const pos = clampPosition(div, centerX, centerY)
+                                setTransform(div, pos.x, pos.y, 1.0, 0)
+                            })
+                            return
+                        }
+                        const nw = img.naturalWidth
+                        const nh = img.naturalHeight
+                        if (nw > 0 && nh > 0) {
+                            const targetSize = 300
+                            div.style.width = targetSize + 'px'
+                            div.style.height = targetSize + 'px'
+                        }
+                        requestAnimationFrame(() => {
+                            const { w: sw, h: sh } = getSceneLayoutCssSize()
+                            const centerX = (sw - div.offsetWidth) / 2
+                            const centerY = (sh - div.offsetHeight) / 2
+                            const pos = clampPosition(div, centerX, centerY)
+                            setTransform(div, pos.x, pos.y, 1.0, 0)
+                        })
+                    }
+                    if (img.complete && img.naturalWidth > 0) {
+                        adjustSize()
+                    } else {
+                        img.onload = adjustSize
+                        img.onerror = adjustSize
+                    }
+
+                    const { w: sw, h: sh } = getSceneLayoutCssSize()
+                    const centerX = (sw - div.offsetWidth) / 2
+                    const centerY = (sh - div.offsetHeight) / 2
+                    const pos = clampPosition(div, centerX, centerY)
+                    setTransform(div, pos.x, pos.y, 1.0, 0)
+
+                    // 如果是新增物品（需要保存状态），保存场景
+                    if (saveState) {
+                        saveSceneState()
+                    }
+
+                    // 调用创建完成回调
+                    if (onCreated) {
+                        onCreated(div)
+                    }
+
+                    return div
+                }
+
+                /** 人物 z 在 [Z_KID_MIN, Z_KID_MAX]；其它物体在 [Z_OTHER_MIN, Z_KID_MIN)，最后选中的在同层最上 */
+                const Z_OTHER_MIN = 10
+                const Z_KID_MIN = 10000
+                const Z_KID_MAX = 49999
+
+                function isKidItem(el) {
+                    return (
+                        el &&
+                        el.getAttribute &&
+                        el.getAttribute('data-type') === 'kid'
+                    )
+                }
+
+                function bumpItemZOrder(el) {
+                    if (!el || !itemsLayer.contains(el)) return
+                    if (isKidItem(el)) {
+                        let maxZ = Z_KID_MIN - 1
+                        itemsLayer
+                            .querySelectorAll('.draggable[data-type="kid"]')
+                            .forEach((n) => {
+                                let z = parseInt(n.style.zIndex, 10)
+                                if (!Number.isFinite(z) || z < Z_KID_MIN)
+                                    z = Z_KID_MIN - 1
+                                maxZ = Math.max(maxZ, z)
+                            })
+                        el.style.zIndex = String(Math.min(maxZ + 1, Z_KID_MAX))
+                    } else {
+                        let maxZ = Z_OTHER_MIN - 1
+                        itemsLayer
+                            .querySelectorAll(
+                                '.draggable:not([data-type="kid"])'
+                            )
+                            .forEach((n) => {
+                                let z = parseInt(n.style.zIndex, 10)
+                                if (!Number.isFinite(z)) z = 5
+                                if (z >= Z_KID_MIN) z = Z_KID_MIN - 1
+                                maxZ = Math.max(maxZ, z)
+                            })
+                        el.style.zIndex = String(
+                            Math.min(
+                                Math.max(maxZ + 1, Z_OTHER_MIN),
+                                Z_KID_MIN - 1
+                            )
+                        )
+                    }
+                }
+
+                // ========== 移动端物品拖拽系统（事件委托） ==========
+                let activeDrag = null
+                let dragStartX = 0,
+                    dragStartY = 0
+                let dragStartTx = 0,
+                    dragStartTy = 0
+                let dragStartScale = 1,
+                    dragStartRotate = 0
+                let activePinch = null
+                let pinchStartDistance = 0,
+                    pinchStartScale = 1
+                let pinchStartAngle = 0,
+                    pinchStartRotate = 0
+                let pinchStartTx = 0,
+                    pinchStartTy = 0
+                let pinchCenterX = 0,
+                    pinchCenterY = 0
+
+                function getItemAtPoint(x, y) {
+                    const elements = document.elementsFromPoint(x, y)
+                    for (const el of elements) {
+                        if (
+                            el.classList &&
+                            el.classList.contains('draggable')
+                        ) {
+                            return el
+                        }
+                    }
+                    return null
+                }
+
+                function getDistance(t1, t2) {
+                    return Math.hypot(
+                        t2.clientX - t1.clientX,
+                        t2.clientY - t1.clientY
+                    )
+                }
+
+                function getAngle(t1, t2) {
+                    return (
+                        (Math.atan2(
+                            t2.clientY - t1.clientY,
+                            t2.clientX - t1.clientX
+                        ) *
+                            180) /
+                        Math.PI
+                    )
+                }
+
+                function getTouchCenter(touches) {
+                    let x = 0,
+                        y = 0
+                    for (let i = 0; i < touches.length; i++) {
+                        x += touches[i].clientX
+                        y += touches[i].clientY
+                    }
+                    return { x: x / touches.length, y: y / touches.length }
+                }
+
+                // 触摸开始
+                function onTouchStart(e) {
+                    const touches = e.touches
+
+                    // 绘画模式下不处理物品拖拽，让 drawCanvas 处理绘画
+                    if (drawingEnabled || eraserEnabled) return
+
+                    if (touches.length === 1) {
+                        // 单指触摸
+                        const el = getItemAtPoint(
+                            touches[0].clientX,
+                            touches[0].clientY
+                        )
+                        if (el) {
+                            if (isLocked(el)) {
+                                selectElement(el)
+                                return
+                            }
+                            activeDrag = el
+                            const { tx, ty, scale, rotate } = getTransform(el)
+                            dragStartX = touches[0].clientX
+                            dragStartY = touches[0].clientY
+                            dragStartTx = tx
+                            dragStartTy = ty
+                            dragStartScale = scale
+                            dragStartRotate = rotate
+                            selectElement(el)
+                            e.preventDefault()
+                        }
+                    } else if (touches.length === 2) {
+                        // 双指触摸 - 缩放和旋转
+                        let el = activeDrag
+                        if (!el) {
+                            // 检查两个手指的位置，找到物品
+                            el =
+                                getItemAtPoint(
+                                    touches[0].clientX,
+                                    touches[0].clientY
+                                ) ||
+                                getItemAtPoint(
+                                    touches[1].clientX,
+                                    touches[1].clientY
+                                )
+                        }
+                        if (el && !isLocked(el)) {
+                            activePinch = el
+                            const center = getTouchCenter([
+                                touches[0],
+                                touches[1],
+                            ])
+                            pinchCenterX = center.x
+                            pinchCenterY = center.y
+                            pinchStartDistance = getDistance(
+                                touches[0],
+                                touches[1]
+                            )
+                            pinchStartAngle = getAngle(touches[0], touches[1])
+                            const { tx, ty, scale, rotate } = getTransform(el)
+                            pinchStartScale = scale
+                            pinchStartRotate = rotate
+                            pinchStartTx = tx
+                            pinchStartTy = ty
+                            selectElement(el)
+                            e.preventDefault()
+                        }
+                    }
+                }
+
+                // 触摸移动
+                function onTouchMove(e) {
+                    const touches = e.touches
+
+                    if (activePinch && touches.length >= 2) {
+                        // 双指缩放旋转
+                        if (isLocked(activePinch)) return
+
+                        const center = getTouchCenter([touches[0], touches[1]])
+                        const curDistance = getDistance(touches[0], touches[1])
+                        const curAngle = getAngle(touches[0], touches[1])
+
+                        const scaleFactor = curDistance / pinchStartDistance
+                        let newScale = pinchStartScale * scaleFactor
+                        newScale = Math.min(
+                            SCALE_MAX,
+                            Math.max(SCALE_MIN, newScale)
+                        )
+
+                        let angleDiff = curAngle - pinchStartAngle
+                        while (angleDiff > 180) angleDiff -= 360
+                        while (angleDiff < -180) angleDiff += 360
+                        let newRotate = pinchStartRotate + angleDiff
+
+                        // 移动位置
+                        const dx = center.x - pinchCenterX
+                        const dy = center.y - pinchCenterY
+                        let newTx = pinchStartTx + dx
+                        let newTy = pinchStartTy + dy
+
+                        const pos = clampPosition(activePinch, newTx, newTy)
+                        setTransform(
+                            activePinch,
+                            pos.x,
+                            pos.y,
+                            newScale,
+                            newRotate
+                        )
+
+                        e.preventDefault()
+                    } else if (activeDrag && touches.length === 1) {
+                        // 单指拖拽
+                        if (isLocked(activeDrag)) return
+
+                        const dx = touches[0].clientX - dragStartX
+                        const dy = touches[0].clientY - dragStartY
+                        let newTx = dragStartTx + dx
+                        let newTy = dragStartTy + dy
+                        const pos = clampPosition(activeDrag, newTx, newTy)
+                        setTransform(
+                            activeDrag,
+                            pos.x,
+                            pos.y,
+                            dragStartScale,
+                            dragStartRotate
+                        )
+                        e.preventDefault()
+                    }
+                }
+
+                // 触摸结束
+                function onTouchEnd(e) {
+                    const touches = e.touches
+                    // 触摸结束时保存场景状态（如果有过操作）
+                    if (activeDrag || activePinch) {
+                        saveSceneState()
+                    }
+                    if (touches.length === 0) {
+                        activeDrag = null
+                        activePinch = null
+                    } else if (touches.length === 1 && activePinch) {
+                        // 双指 → 单指：必须先对齐单指拖拽基准，否则会沿用 pinch 前的
+                        // dragStartScale / dragStartRotate，下一帧 touchmove 把缩放“弹回去”
+                        const el = activePinch
+                        activePinch = null
+                        const t = touches[0]
+                        const cur = getTransform(el)
+                        if (activeDrag === el) {
+                            dragStartX = t.clientX
+                            dragStartY = t.clientY
+                            dragStartTx = cur.tx
+                            dragStartTy = cur.ty
+                            dragStartScale = cur.scale
+                            dragStartRotate = cur.rotate
+                        }
+                    } else if (touches.length === 1) {
+                        activePinch = null
+                    }
+                }
+
+                // 绑定触摸事件到 scene
+                scene.addEventListener('touchstart', onTouchStart, {
+                    passive: false,
+                })
+                scene.addEventListener('touchmove', onTouchMove, {
+                    passive: false,
+                })
+                scene.addEventListener('touchend', onTouchEnd)
+                scene.addEventListener('touchcancel', onTouchEnd)
+
+                // ========== 桌面端鼠标拖拽 ==========
+                let mouseDragTarget = null
+                let mouseStartX = 0,
+                    mouseStartY = 0
+                let mouseStartTx = 0,
+                    mouseStartTy = 0
+                let mouseStartScale = 1,
+                    mouseStartRotate = 0
+
+                scene.addEventListener('mousedown', function (e) {
+                    const el = getItemAtPoint(e.clientX, e.clientY)
+                    // 只有点击物品时才取消绘画模式，点击空白处保持绘画
+                    if (el) {
+                        if (drawingEnabled || eraserEnabled) {
+                            disableAllModes()
+                            selectElement(el)
+                            return
+                        }
+                        if (isLocked(el)) {
+                            selectElement(el)
+                            return
+                        }
+                        mouseDragTarget = el
+                        const { tx, ty, scale, rotate } = getTransform(el)
+                        mouseStartX = e.clientX
+                        mouseStartY = e.clientY
+                        mouseStartTx = tx
+                        mouseStartTy = ty
+                        mouseStartScale = scale
+                        mouseStartRotate = rotate
+                        selectElement(el)
+                    }
+                })
+
+                document.addEventListener('mousemove', function (e) {
+                    if (mouseDragTarget) {
+                        if (isLocked(mouseDragTarget)) return
+                        const dx = e.clientX - mouseStartX
+                        const dy = e.clientY - mouseStartY
+                        let newTx = mouseStartTx + dx
+                        let newTy = mouseStartTy + dy
+                        const pos = clampPosition(mouseDragTarget, newTx, newTy)
+                        setTransform(
+                            mouseDragTarget,
+                            pos.x,
+                            pos.y,
+                            mouseStartScale,
+                            mouseStartRotate
+                        )
+                    }
+                })
+
+                document.addEventListener('mouseup', function () {
+                    if (mouseDragTarget) {
+                        // 拖拽结束时保存场景状态
+                        saveSceneState()
+                    }
+                    mouseDragTarget = null
+                })
+
+                // 滚轮缩放
+                function onWheel(e) {
+                    if (!currentSelected) return
+                    if (drawingEnabled || eraserEnabled) return
+                    if (isLocked(currentSelected)) return
+
+                    e.preventDefault()
+                    const delta = e.deltaY > 0 ? 0.9 : 1.1
+                    const { tx, ty, scale, rotate } =
+                        getTransform(currentSelected)
+                    let newScale = scale * delta
+                    newScale = Math.min(
+                        SCALE_MAX,
+                        Math.max(SCALE_MIN, newScale)
+                    )
+                    setTransform(currentSelected, tx, ty, newScale, rotate)
+                }
+
+                scene.addEventListener('wheel', onWheel, { passive: false })
+
+                function selectElement(el) {
+                    // 点击画布上的物品时自动取消画笔/橡皮擦模式
+                    if (drawingEnabled || eraserEnabled) {
+                        disableAllModes()
+                    }
+                    if (currentSelected)
+                        currentSelected.classList.remove('selected')
+                    currentSelected = el
+                    el.classList.add('selected')
+                    bumpItemZOrder(el)
+                }
+                // 点击物品栏时不取消画笔模式，只选中物品
+                function selectElementNoDisable(el) {
+                    if (currentSelected)
+                        currentSelected.classList.remove('selected')
+                    currentSelected = el
+                    el.classList.add('selected')
+                    bumpItemZOrder(el)
+                }
+                function clearSelection() {
+                    if (currentSelected)
+                        currentSelected.classList.remove('selected')
+                    currentSelected = null
+                }
+                function deleteSelected() {
+                    if (!currentSelected) return
+                    saveSceneState()
+                    if (confirm('确定删除选中的物品吗？')) {
+                        currentSelected.remove()
+                        clearSelection()
+                    }
+                }
+                function clearScene() {
+                    if (confirm('确定清空所有物品和绘画吗？')) {
+                        itemsLayer.innerHTML = ''
+                        clearCanvas()
+                        clearSelection()
+                    }
+                }
+                function clearCanvas() {
+                    ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height)
+                }
+
+                function disableBrushAndEraser() {
+                    drawingEnabled = false
+                    eraserEnabled = false
+                    drawCanvas.classList.remove('drawing-mode')
+                    document
+                        .getElementById('brushBtn')
+                        .classList.remove('active')
+                    document
+                        .getElementById('eraserBtn')
+                        .classList.remove('active')
+                    updateInteractionLock()
+                    updateCursor()
+                }
+
+                function disableAllModes() {
+                    clearSelection() // 取消物品选择
+                    closeAllDropdowns()
+                    disableBrushAndEraser()
+                }
+
+                function closeAllDropdowns() {
+                    document
+                        .querySelectorAll('.brush-dropdown-content')
+                        .forEach((el) => el.classList.remove('show'))
+                }
+                function toggleDrawing() {
+                    if (drawingEnabled) {
+                        disableAllModes()
+                        return
+                    }
+                    disableAllModes()
+                    drawingEnabled = true
+                    drawCanvas.classList.add('drawing-mode')
+                    document.getElementById('brushBtn').classList.add('active')
+                    updateInteractionLock()
+                    updateCursor()
+                    closeAllDropdowns()
+                }
+                function updateCursor() {
+                    if (drawingEnabled || eraserEnabled) {
+                        cursorDiv.style.display = 'block'
+                        if (eraserEnabled) {
+                            cursorDiv.classList.add('eraser-mode')
+                            const s = Math.max(8, Math.min(eraserSize, 64))
+                            cursorDiv.style.width = s + 'px'
+                            cursorDiv.style.height = s + 'px'
+                        } else {
+                            cursorDiv.classList.remove('eraser-mode')
+                            cursorDiv.style.removeProperty('width')
+                            cursorDiv.style.removeProperty('height')
+                        }
+                    } else {
+                        cursorDiv.style.display = 'none'
+                        cursorDiv.classList.remove('eraser-mode')
+                        cursorDiv.style.removeProperty('width')
+                        cursorDiv.style.removeProperty('height')
+                    }
+                }
+                function moveCursor(e) {
+                    if (!drawingEnabled && !eraserEnabled) return
+                    let cx, cy
+                    if (e.touches) {
+                        cx = e.touches[0].clientX
+                        cy = e.touches[0].clientY
+                    } else {
+                        cx = e.clientX
+                        cy = e.clientY
+                    }
+                    setCursorPos(cx, cy)
+                }
+                function getCanvasCoords(e) {
+                    const rect = drawCanvas.getBoundingClientRect()
+
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+
+                    return {
+                        x: clientX - rect.left,
+                        y: clientY - rect.top,
+                    }
+                }
+                // 记录上一个点用于曲线平滑
+                let lastX, lastY
+
+                function startDrawing(e) {
+                    if (!drawingEnabled && !eraserEnabled) return
+                    e.preventDefault()
+                    const isTouch = e.touches !== undefined
+                    if (isTouch && isDrawingFromTouch) return
+                    if (!isTouch && isDrawing) return
+                    closeAllDropdowns()
+                    saveSceneState()
+                    const { x, y } = getCanvasCoords(e)
+                    isDrawing = true
+                    if (isTouch) isDrawingFromTouch = true
+                    lastX = x
+                    lastY = y
+                    ctx.beginPath()
+                    ctx.moveTo(x, y)
+                    ctx.lineWidth = eraserEnabled ? eraserSize : brushSize
+                    ctx.strokeStyle = brushColor
+                    ctx.lineCap = 'round'
+                    ctx.lineJoin = 'round'
+                    ctx.globalCompositeOperation = eraserEnabled
+                        ? 'destination-out'
+                        : 'source-over'
+                }
+                // 使用二次贝塞尔曲线平滑线条
+                function draw(e) {
+                    if (!isDrawing) return
+                    e.preventDefault()
+                    const { x, y } = getCanvasCoords(e)
+                    const midX = (lastX + x) / 2
+                    const midY = (lastY + y) / 2
+                    ctx.quadraticCurveTo(lastX, lastY, midX, midY)
+                    ctx.stroke()
+                    ctx.beginPath()
+                    ctx.moveTo(midX, midY)
+                    lastX = x
+                    lastY = y
+                }
+                function stopDrawing() {
+                    if (!isDrawing && !isDrawingFromTouch) return
+                    isDrawing = false
+                    isDrawingFromTouch = false
+                    ctx.globalCompositeOperation = 'source-over'
+                }
+                function setBrushSize(size) {
+                    brushSize = size
+                    const panel = document.getElementById(
+                        'brushDropdownContent'
+                    )
+                    if (!panel) return
+                    panel
+                        .querySelectorAll('.size-btn')
+                        .forEach((btn) =>
+                            btn.classList.toggle(
+                                'active',
+                                parseInt(btn.dataset.size, 10) === size
+                            )
+                        )
+                }
+                function setEraserSize(size) {
+                    eraserSize = size
+                    const panel = document.getElementById(
+                        'eraserDropdownContent'
+                    )
+                    if (!panel) return
+                    panel
+                        .querySelectorAll('.eraser-size-btn')
+                        .forEach((btn) =>
+                            btn.classList.toggle(
+                                'active',
+                                parseInt(btn.dataset.size, 10) === size
+                            )
+                        )
+                    updateCursor()
+                }
+                function setBrushColor(color) {
+                    brushColor = color
+                }
+                // 保存完整场景状态（物品 + 画布）用于撤销
+                function saveSceneState() {
+                    // 保存所有物品的信息
+                    const items = []
+                    document.querySelectorAll('.draggable').forEach((el) => {
+                        const img = el.querySelector('img')
+                        if (img && img.src) {
+                            const { tx, ty, scale, rotate } = getTransform(el)
+                            items.push({
+                                type: el.dataset.type,
+                                imgUrl: img.src,
+                                tx: tx,
+                                ty: ty,
+                                scale: scale,
+                                rotate: rotate,
+                                zIndex: (() => {
+                                    const z = parseInt(el.style.zIndex, 10)
+                                    if (Number.isFinite(z)) return String(z)
+                                    return isKidItem(el)
+                                        ? String(Z_KID_MIN)
+                                        : '5'
+                                })(),
+                            })
+                        }
+                    })
+                    // 保存画布状态
+                    const canvasState = drawCanvas.toDataURL('image/png')
+                    sceneHistory.push({ items: items, canvas: canvasState })
+                    if (sceneHistory.length > maxHistorySize) {
+                        sceneHistory.shift()
+                    }
+                }
+                // 撤销上一步
+                function undoScene() {
+                    if (sceneHistory.length === 0) return
+
+                    const currentState = sceneHistory.pop()
+
+                    // 清空物品层
+                    itemsLayer.innerHTML = ''
+                    clearCanvas()
+
+                    // 恢复画布
+                    if (currentState && currentState.canvas) {
+                        const canvasImg = new Image()
+                        canvasImg.onload = function () {
+                            ctx.drawImage(
+                                canvasImg,
+                                0,
+                                0,
+                                drawCanvas.width,
+                                drawCanvas.height
+                            )
+                        }
+                        canvasImg.src = currentState.canvas
+                    }
+
+                    // 恢复物品
+                    if (
+                        currentState &&
+                        currentState.items &&
+                        currentState.items.length > 0
+                    ) {
+                        currentState.items.forEach((item) => {
+                            const div = document.createElement('div')
+                            div.className = 'draggable'
+                            div.setAttribute('data-type', item.type)
+
+                            const spinner = document.createElement('div')
+                            spinner.className = 'img-spinner'
+                            div.appendChild(spinner)
+
+                            const img = document.createElement('img')
+                            img.crossOrigin = 'anonymous'
+                            img.src = item.imgUrl
+                            img.alt = item.type
+                            img.draggable = false
+                            img.style.opacity = '0'
+                            img.style.transition = 'opacity 0.3s'
+                            div.appendChild(img)
+
+                            div.style.position = 'absolute'
+                            itemsLayer.appendChild(div)
+
+                            // 图片加载完成后设置样式和位置
+                            img.onload = function () {
+                                spinner.style.display = 'none'
+                                img.style.opacity = '1'
+
+                                if (item.type === 'kid') {
+                                    applyKidDisplaySize(div, img)
+                                } else {
+                                    const targetSize = 300
+                                    div.style.width = targetSize + 'px'
+                                    div.style.height = targetSize + 'px'
+                                }
+
+                                // 设置位置和变换
+                                setTransform(
+                                    div,
+                                    item.tx,
+                                    item.ty,
+                                    item.scale,
+                                    item.rotate
+                                )
+                                div.style.zIndex =
+                                    item.zIndex != null && item.zIndex !== ''
+                                        ? item.zIndex
+                                        : item.type === 'kid'
+                                        ? String(Z_KID_MIN)
+                                        : String(Z_OTHER_MIN)
+                            }
+                            img.onerror = function () {
+                                // 图片加载失败时也尝试恢复位置
+                                spinner.style.display = 'none'
+                                img.style.opacity = '1'
+                                if (item.type === 'kid') {
+                                    div.style.width = '160px'
+                                    div.style.height = '200px'
+                                } else {
+                                    const targetSize = 300
+                                    div.style.width = targetSize + 'px'
+                                    div.style.height = targetSize + 'px'
+                                }
+                                setTransform(
+                                    div,
+                                    item.tx,
+                                    item.ty,
+                                    item.scale,
+                                    item.rotate
+                                )
+                                div.style.zIndex =
+                                    item.zIndex != null && item.zIndex !== ''
+                                        ? item.zIndex
+                                        : item.type === 'kid'
+                                        ? String(Z_KID_MIN)
+                                        : String(Z_OTHER_MIN)
+                            }
+                        })
+                    }
+                }
+                /** 与 saveImage / 预览共用：把物品画进与 bgCanvas 同尺寸的位图坐标系 */
+                function drawDraggablesToCanvas(ctx) {
+                    const list = Array.prototype.slice.call(
+                        itemsLayer.querySelectorAll('.draggable')
+                    )
+                    list.sort(function (a, b) {
+                        const za = parseInt(a.style.zIndex, 10)
+                        const zb = parseInt(b.style.zIndex, 10)
+                        const ea = Number.isFinite(za) ? za : 5
+                        const eb = Number.isFinite(zb) ? zb : 5
+                        return ea - eb
+                    })
+                    list.forEach(function (el) {
+                        const img = el.querySelector('img')
+                        if (!img || !img.complete || img.naturalWidth === 0)
+                            return
+                        const nw = img.naturalWidth
+                        const nh = img.naturalHeight
+                        const W = el.offsetWidth
+                        const H = el.offsetHeight
+                        if (W < 1 || H < 1) return
+                        // 与 CSS object-fit: contain 一致，避免把整张图硬拉到 W×H 导致与屏幕尺寸/比例不符
+                        const fit = Math.min(W / nw, H / nh)
+                        const dw = nw * fit
+                        const dh = nh * fit
+                        const { tx, ty, scale, rotate } = getTransform(el)
+                        const centerX = tx + W / 2
+                        const centerY = ty + H / 2
+                        ctx.save()
+                        ctx.translate(centerX, centerY)
+                        // 与 style.transform = translate scale rotate 的矩阵顺序一致：T * S * R
+                        ctx.scale(scale, scale)
+                        ctx.rotate((rotate * Math.PI) / 180)
+                        ctx.drawImage(
+                            img,
+                            0,
+                            0,
+                            nw,
+                            nh,
+                            -dw / 2,
+                            -dh / 2,
+                            dw,
+                            dh
+                        )
+                        ctx.restore()
+                    })
+                }
+
+                /** 将场景（背景 + 物品 + 涂鸦）合成到已有尺寸的 2d 上下文。
+                 *  @param {CanvasRenderingContext2D} ctx
+                 *  @param {number} [targetCssW] 与 getSceneLayoutCssSize() 一致的 CSS 像素宽；不传则与内部位图同尺寸
+                 *  @param {number} [targetCssH]
+                 */
+                function compositeSceneToContext(ctx, targetCssW, targetCssH) {
+                    const bufW = bgCanvas.width
+                    const bufH = bgCanvas.height
+                    if (bufW < 1 || bufH < 1) return
+                    const c = ctx.canvas
+                    let outW = bufW
+                    let outH = bufH
+                    if (
+                        typeof targetCssW === 'number' &&
+                        typeof targetCssH === 'number' &&
+                        targetCssW >= 1 &&
+                        targetCssH >= 1
+                    ) {
+                        outW = Math.round(targetCssW)
+                        outH = Math.round(targetCssH)
+                    }
+                    if (c.width !== outW || c.height !== outH) {
+                        c.width = outW
+                        c.height = outH
+                    }
+                    ctx.setTransform(1, 0, 0, 1, 0, 0)
+                    ctx.imageSmoothingEnabled = true
+                    ctx.imageSmoothingQuality = 'high'
+                    ctx.drawImage(bgCanvas, 0, 0, bufW, bufH, 0, 0, outW, outH)
+                    drawDraggablesToCanvas(ctx)
+                    ctx.drawImage(
+                        drawCanvas,
+                        0,
+                        0,
+                        bufW,
+                        bufH,
+                        0,
+                        0,
+                        outW,
+                        outH
+                    )
+                }
+
+                function saveImage() {
+                    const bufW = bgCanvas.width
+                    const bufH = bgCanvas.height
+                    if (bufW < 1 || bufH < 1) return
+                    const { w: outW, h: outH } = getSceneLayoutCssSize()
+                    const offCanvas = document.createElement('canvas')
+                    offCanvas.width = outW
+                    offCanvas.height = outH
+                    compositeSceneToContext(
+                        offCanvas.getContext('2d'),
+                        outW,
+                        outH
+                    )
+
+                    const fileName = '小人国大世界.png'
+                    offCanvas.toBlob(function (blob) {
+                        if (!blob) return
+
+                        const url = URL.createObjectURL(blob)
+                        const link = document.createElement('a')
+                        link.download = fileName
+                        link.href = url
+                        link.click()
+                        setTimeout(function () {
+                            URL.revokeObjectURL(url)
+                        }, 1500)
+
+                        const formdata = new FormData()
+                        formdata.append('image', blob, fileName)
+                        fetch(
+                            'https://06398460-1335-4c8e-b45e-3acd37c663ef.dev.coze.site/api/videos',
+                            {
+                                method: 'POST',
+                                body: formdata,
+                                redirect: 'follow',
+                            }
+                        )
+                            .then(function (response) {
+                                return response.text()
+                            })
+                            .then(function (result) {
+                                console.log(result)
+                            })
+                            .catch(function (error) {
+                                console.log('error', error)
+                            })
+                    }, 'image/png')
+                }
+
+                // ---------- 画布区域视频录制（画面 + 麦克风）----------
+                let recordCanvas = null
+                let recordCtx = null
+                let recordRafId = null
+                let recordActive = false
+                let mediaRecorder = null
+                let recordChunks = []
+                let recordMicStream = null
+                let recordVideoStream = null
+
+                function ensureRecordCanvas() {
+                    if (!recordCanvas) {
+                        recordCanvas = document.createElement('canvas')
+                        recordCtx = recordCanvas.getContext('2d')
+                        recordCanvas.setAttribute('aria-hidden', 'true')
+                        Object.assign(recordCanvas.style, {
+                            position: 'fixed',
+                            left: '0',
+                            top: '0',
+                            width: '1px',
+                            height: '1px',
+                            opacity: '0',
+                            pointerEvents: 'none',
+                            zIndex: '-1',
+                        })
+                        document.body.appendChild(recordCanvas)
+                    }
+                }
+
+                /** 优先 MP4（Chrome 126+ 等），否则 WebM */
+                function createBestMediaRecorder(stream) {
+                    const candidates = [
+                        'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+                        'video/mp4;codecs=avc1,mp4a.40.2',
+                        'video/mp4;codecs=h264,aac',
+                        'video/mp4',
+                        'video/webm;codecs=vp9,opus',
+                        'video/webm;codecs=vp8,opus',
+                        'video/webm',
+                    ]
+                    for (let i = 0; i < candidates.length; i++) {
+                        const mime = candidates[i]
+                        if (!MediaRecorder.isTypeSupported(mime)) continue
+                        try {
+                            return new MediaRecorder(stream, { mimeType: mime })
+                        } catch (e) {
+                            /* 部分浏览器 isTypeSupported 为真仍无法实例化，试下一项 */
+                        }
+                    }
+                    return new MediaRecorder(stream)
+                }
+
+                function extensionFromRecorderMime(mime) {
+                    if (!mime || typeof mime !== 'string') return 'webm'
+                    const m = mime.toLowerCase()
+                    if (m.indexOf('mp4') !== -1) return 'mp4'
+                    if (m.indexOf('webm') !== -1) return 'webm'
+                    return 'webm'
+                }
+
+                function recordFrameLoop() {
+                    if (!recordActive || !recordCtx) return
+                    const { w, h } = getSceneLayoutCssSize()
+                    compositeSceneToContext(recordCtx, w, h)
+                    recordRafId = requestAnimationFrame(recordFrameLoop)
+                }
+
+                function stopTracks(stream) {
+                    if (!stream) return
+                    stream.getTracks().forEach(function (t) {
+                        t.stop()
+                    })
+                }
+
+                function finishSceneRecordingDownload() {
+                    const mimeType = mediaRecorder
+                        ? mediaRecorder.mimeType || 'video/mp4'
+                        : 'video/mp4'
+                    const ext = extensionFromRecorderMime(mimeType)
+                    const blob = new Blob(recordChunks, { type: mimeType })
+                    recordChunks = []
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download =
+                        '小人国录制_' +
+                        new Date()
+                            .toISOString()
+                            .slice(0, 19)
+                            .replace(/[:-]/g, '') +
+                        '.' +
+                        ext
+                    a.click()
+                    setTimeout(function () {
+                        URL.revokeObjectURL(url)
+                    }, 2000)
+                }
+
+                function stopSceneRecording() {
+                    recordActive = false
+                    if (recordRafId != null) {
+                        cancelAnimationFrame(recordRafId)
+                        recordRafId = null
+                    }
+                    const btn = document.getElementById('recordBtnHeader')
+                    if (btn) {
+                        btn.classList.remove('recording')
+                        btn.title = '视频录制'
+                        const icon = btn.querySelector('i')
+                        if (icon) {
+                            icon.className = 'fas fa-video'
+                        }
+                    }
+                    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                        try {
+                            if (typeof mediaRecorder.requestData === 'function')
+                                mediaRecorder.requestData()
+                            mediaRecorder.stop()
+                        } catch (e) {
+                            console.warn(e)
+                            stopTracks(recordMicStream)
+                            stopTracks(recordVideoStream)
+                            recordMicStream = recordVideoStream = null
+                            mediaRecorder = null
+                        }
+                    } else {
+                        stopTracks(recordMicStream)
+                        stopTracks(recordVideoStream)
+                        recordMicStream = recordVideoStream = null
+                        mediaRecorder = null
+                    }
+                }
+
+                async function startSceneRecording() {
+                    if (!window.MediaRecorder) {
+                        alert('当前浏览器不支持视频录制（MediaRecorder）。')
+                        return
+                    }
+                    const bufW = bgCanvas.width
+                    const bufH = bgCanvas.height
+                    if (bufW < 1 || bufH < 1) return
+
+                    let micStream = null
+                    try {
+                        micStream = await navigator.mediaDevices.getUserMedia({
+                            audio: true,
+                            video: false,
+                        })
+                    } catch (e) {
+                        alert(
+                            '无法使用麦克风，请允许权限后重试。错误：' +
+                                (e && e.message ? e.message : String(e))
+                        )
+                        return
+                    }
+
+                    ensureRecordCanvas()
+                    const { w: rw, h: rh } = getSceneLayoutCssSize()
+                    recordCanvas.width = rw
+                    recordCanvas.height = rh
+                    compositeSceneToContext(recordCtx, rw, rh)
+
+                    let videoStream = null
+                    try {
+                        videoStream = recordCanvas.captureStream(30)
+                    } catch (e) {
+                        stopTracks(micStream)
+                        alert(
+                            '无法从画布捕获视频流。错误：' +
+                                (e && e.message ? e.message : String(e))
+                        )
+                        return
+                    }
+
+                    const out = new MediaStream()
+                    videoStream.getVideoTracks().forEach(function (t) {
+                        out.addTrack(t)
+                    })
+                    micStream.getAudioTracks().forEach(function (t) {
+                        out.addTrack(t)
+                    })
+
+                    let recorder = null
+                    try {
+                        recorder = createBestMediaRecorder(out)
+                    } catch (e) {
+                        stopTracks(micStream)
+                        stopTracks(videoStream)
+                        alert(
+                            '无法创建录制器。错误：' +
+                                (e && e.message ? e.message : String(e))
+                        )
+                        return
+                    }
+
+                    recordChunks = []
+                    recordMicStream = micStream
+                    recordVideoStream = videoStream
+                    mediaRecorder = recorder
+
+                    mediaRecorder.ondataavailable = function (e) {
+                        if (e.data && e.data.size > 0) recordChunks.push(e.data)
+                    }
+                    mediaRecorder.onstop = function () {
+                        finishSceneRecordingDownload()
+                        stopTracks(recordMicStream)
+                        stopTracks(recordVideoStream)
+                        recordMicStream = recordVideoStream = null
+                        mediaRecorder = null
+                    }
+
+                    try {
+                        mediaRecorder.start(250)
+                    } catch (e) {
+                        stopTracks(micStream)
+                        stopTracks(videoStream)
+                        mediaRecorder = null
+                        alert(
+                            '开始录制失败：' +
+                                (e && e.message ? e.message : String(e))
+                        )
+                        return
+                    }
+
+                    recordActive = true
+                    const btn = document.getElementById('recordBtnHeader')
+                    if (btn) {
+                        btn.classList.add('recording')
+                        btn.title = '结束录制并下载'
+                        const icon = btn.querySelector('i')
+                        if (icon) icon.className = 'fas fa-stop'
+                    }
+                    recordFrameLoop()
+                }
+
+                function toggleSceneRecording() {
+                    if (recordActive) {
+                        stopSceneRecording()
+                    } else {
+                        startSceneRecording()
+                    }
+                }
+
+                function buildCategoryItemsFromFiles(subdir, keyPrefix, files) {
+                    const items = {}
+                    for (const file of files) {
+                        const name = file.replace(/\.webp$/i, '')
+                        items[keyPrefix + '_' + name] = {
+                            name: name,
+                            variants: [
+                                {
+                                    img: `./public/${subdir}/${file}`,
+                                    alt: name,
+                                },
+                            ],
+                        }
+                    }
+                    return items
+                }
+
+                function buildFoodCategoryItems() {
+                    return buildCategoryItemsFromFiles('foods', 'food', [
+                        '豆1.webp',
+                        '豆2.webp',
+                        '西瓜1.webp',
+                        '西瓜2.webp',
+                        '西瓜3.webp',
+                        '蘑菇1.webp',
+                        '西蓝花1.webp',
+                        '西蓝花3.webp',
+                        '面包1.webp',
+                        '面包2.webp',
+                        '杨桃1.webp',
+                        '杨桃2.webp',
+                        '香蕉2.webp',
+                        '香蕉3.webp',
+                        '橘子1.webp',
+                        '橘子2.webp',
+                    ])
+                }
+
+                function buildOtherCategoryItems() {
+                    return buildCategoryItemsFromFiles('others', 'other', [
+                        '勺子2.webp',
+                        '勺子3.webp',
+                        '衣架1.webp',
+                        '衣架2.webp',
+                        '锅碗1.webp',
+                        '锅碗2.webp',
+                        '梯子1.webp',
+                        '梯子2.webp',
+                        '鞋1.webp',
+                        '鞋2.webp',
+                        '鞋3.webp',
+                        '卷纸1.webp',
+                        '卷纸2.webp',
+                    ])
+                }
+
+                function buildKidsCategoryItems() {
+                    return buildCategoryItemsFromFiles('child', 'child', [
+                        '3.webp',
+                        '图片1.webp',
+                        '图片3.webp',
+                        '图片5.webp',
+                        '图片1555.webp',
+                        '图片1653.webp',
+                    ])
+                }
+
+                // ============ 物品配置（支持多个变体）============
+                const itemsConfig = {
+                    food: {
+                        name: '食品',
+                        icon: 'fa-utensils',
+                        items: buildFoodCategoryItems(),
+                    },
+                    other: {
+                        name: '其他',
+                        icon: 'fa-box-open',
+                        items: buildOtherCategoryItems(),
+                    },
+                    kids: {
+                        name: '儿童',
+                        icon: 'fa-child',
+                        items: buildKidsCategoryItems(),
+                    },
+                }
+
+                // 存储分类展开状态（与 itemsConfig 同步，默认全部展开）
+                const categoryExpanded = Object.fromEntries(
+                    Object.keys(itemsConfig).map((k) => [k, true])
+                )
+
+                const thumbImageCache = Object.create(null)
+                let thumbLoadsActive = 0
+                const THUMB_LOAD_MAX = 12
+                const thumbLoadWaiters = []
+                let sidebarThumbObserver = null
+
+                function drainThumbLoadQueue() {
+                    while (
+                        thumbLoadsActive < THUMB_LOAD_MAX &&
+                        thumbLoadWaiters.length
+                    ) {
+                        thumbLoadWaiters.shift()()
+                    }
+                }
+
+                function loadThumbImage(url) {
+                    if (thumbImageCache[url]) return thumbImageCache[url]
+                    thumbImageCache[url] = new Promise(function (
+                        resolve,
+                        reject
+                    ) {
+                        function start() {
+                            thumbLoadsActive++
+                            const image = new Image()
+                            image.decoding = 'async'
+                            image.onload = function () {
+                                thumbLoadsActive--
+                                drainThumbLoadQueue()
+                                resolve(image)
+                            }
+                            image.onerror = function () {
+                                thumbLoadsActive--
+                                drainThumbLoadQueue()
+                                reject(new Error('thumb load failed'))
+                            }
+                            image.src = url
+                        }
+                        if (thumbLoadsActive < THUMB_LOAD_MAX) start()
+                        else thumbLoadWaiters.push(start)
+                    })
+                    return thumbImageCache[url]
+                }
+
+                function applyThumbToImg(img, url) {
+                    loadThumbImage(url)
+                        .then(function () {
+                            if (img.isConnected) img.src = url
+                        })
+                        .catch(function () {
+                            if (img.isConnected) img.src = url
+                        })
+                }
+
+                function observeSidebarThumb(img) {
+                    const url = img.getAttribute('data-thumb')
+                    if (!url) return
+                    if (!sidebarThumbObserver) {
+                        const root = document.querySelector('.toolbar-left')
+                        sidebarThumbObserver = new IntersectionObserver(
+                            function (entries) {
+                                entries.forEach(function (entry) {
+                                    if (!entry.isIntersecting) return
+                                    const el = entry.target
+                                    sidebarThumbObserver.unobserve(el)
+                                    const u = el.getAttribute('data-thumb')
+                                    if (!u) return
+                                    el.removeAttribute('data-thumb')
+                                    applyThumbToImg(el, u)
+                                })
+                            },
+                            {
+                                root: root,
+                                rootMargin: '120px 0px',
+                                threshold: 0.01,
+                            }
+                        )
+                    }
+                    sidebarThumbObserver.observe(img)
+                }
+
+                function hydrateCategoryThumbs(itemsEl) {
+                    if (!itemsEl) return
+                    itemsEl
+                        .querySelectorAll('img[data-thumb]')
+                        .forEach(observeSidebarThumb)
+                }
+
+                function hydrateVariantThumbs(container) {
+                    if (!container) return
+                    container
+                        .querySelectorAll('img[data-thumb]')
+                        .forEach(function (img) {
+                            const u = img.getAttribute('data-thumb')
+                            if (!u) return
+                            img.removeAttribute('data-thumb')
+                            applyThumbToImg(img, u)
+                        })
+                }
+
+                function renderItemsPanel() {
+                    const container = document.getElementById('itemsContainer')
+                    if (!container) return
+                    container.innerHTML = ''
+
+                    for (const [category, data] of Object.entries(
+                        itemsConfig
+                    )) {
+                        const categoryDiv = document.createElement('div')
+                        categoryDiv.className = 'category'
+
+                        const expanded = categoryExpanded[category]
+                        const titleDiv = document.createElement('div')
+                        titleDiv.className =
+                            'category-title' + (expanded ? ' expanded' : '')
+                        titleDiv.innerHTML = `<i class="fas ${data.icon}"></i> ${data.name}<i class="fas fa-chevron-down collapse-icon"></i>`
+                        titleDiv.dataset.category = category
+
+                        // 点击分类标题展开/收起
+                        titleDiv.addEventListener('click', (e) => {
+                            e.stopPropagation()
+                            toggleCategory(category, titleDiv, itemsDiv)
+                        })
+
+                        categoryDiv.appendChild(titleDiv)
+
+                        const itemsDiv = document.createElement('div')
+                        itemsDiv.className =
+                            'category-items' + (expanded ? ' show' : '')
+                        itemsDiv.id = `cat-${category}`
+
+                        // 渲染物品按钮
+                        for (const [type, itemData] of Object.entries(
+                            data.items
+                        )) {
+                            const btn = document.createElement('button')
+                            btn.className = 'mat-btn'
+                            btn.dataset.type = type
+                            btn.dataset.category = category
+                            btn.title = itemData.name
+                            btn.innerHTML = `<img src="${THUMB_PLACEHOLDER}" data-thumb="${itemData.variants[0].img}" alt="${itemData.name}" width="48" height="48" decoding="async">`
+
+                            // 点击展开变体选择
+                            btn.addEventListener('click', (e) => {
+                                e.stopPropagation()
+                                disableBrushAndEraser()
+                                closeAllDropdowns()
+                                toggleVariants(category, type)
+                            })
+
+                            itemsDiv.appendChild(btn)
+                        }
+
+                        categoryDiv.appendChild(itemsDiv)
+                        container.appendChild(categoryDiv)
+                        if (expanded) hydrateCategoryThumbs(itemsDiv)
+                    }
+                }
+
+                // 展开/收起分类
+                function toggleCategory(category, titleEl, itemsEl) {
+                    categoryExpanded[category] = !categoryExpanded[category]
+                    const on = categoryExpanded[category]
+                    if (titleEl && itemsEl) {
+                        titleEl.classList.toggle('expanded', on)
+                        itemsEl.classList.toggle('show', on)
+                        if (on)
+                            requestAnimationFrame(function () {
+                                hydrateCategoryThumbs(itemsEl)
+                            })
+                    }
+                }
+
+                // 当前展开的变体
+                let expandedVariant = null
+
+                // 展开/收起变体选择
+                function toggleVariants(category, type) {
+                    const itemsData = itemsConfig[category]?.items[type]
+                    if (!itemsData || itemsData.variants.length <= 1) {
+                        // 只有一个变体，直接添加
+                        addItemToCanvas(category, type, 0)
+                        return
+                    }
+
+                    // 如果已展开同一物品，则收起
+                    if (
+                        expandedVariant &&
+                        expandedVariant.category === category &&
+                        expandedVariant.type === type
+                    ) {
+                        hideVariants()
+                        return
+                    }
+
+                    showVariants(category, type, itemsData)
+                }
+
+                // 显示变体选择
+                function showVariants(category, type, itemsData) {
+                    hideVariants()
+
+                    // 创建变体选择面板
+                    const panel = document.createElement('div')
+                    panel.className = 'variants-panel'
+                    panel.id = 'variantsPanel'
+
+                    const title = document.createElement('div')
+                    title.className = 'variants-title'
+                    title.textContent = itemsData.name
+                    panel.appendChild(title)
+
+                    const grid = document.createElement('div')
+                    grid.className = 'variants-grid'
+
+                    itemsData.variants.forEach((variant, index) => {
+                        const btn = document.createElement('button')
+                        btn.className = 'variant-btn'
+                        btn.innerHTML = `<img src="${THUMB_PLACEHOLDER}" data-thumb="${variant.img}" alt="${variant.alt}" width="48" height="48" decoding="async">`
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation()
+                            addItemToCanvas(category, type, index)
+                            hideVariants()
+                        })
+                        grid.appendChild(btn)
+                    })
+
+                    panel.appendChild(grid)
+                    document.body.appendChild(panel)
+                    hydrateVariantThumbs(panel)
+
+                    // 定位在点击的物品按钮旁边（带边界检测）
+                    const btn = document.querySelector(
+                        `.mat-btn[data-type="${type}"]`
+                    )
+                    if (btn) {
+                        const rect = btn.getBoundingClientRect()
+                        const panelWidth = 220 // 面板宽度
+                        const panelHeight = 250 // 面板高度估算
+
+                        let left = rect.left
+                        let top = rect.bottom + 5
+
+                        // 右边界检测
+                        if (left + panelWidth > window.innerWidth) {
+                            left = window.innerWidth - panelWidth - 10
+                        }
+                        // 左边界检测
+                        if (left < 10) left = 10
+
+                        // 下边界检测
+                        if (top + panelHeight > window.innerHeight) {
+                            top = rect.top - panelHeight - 5 // 显示在按钮上方
+                        }
+
+                        panel.style.left = `${left}px`
+                        panel.style.top = `${top}px`
+                    }
+
+                    expandedVariant = { category, type, panel }
+
+                    // 点击其他地方收起
+                    setTimeout(() => {
+                        document.addEventListener(
+                            'click',
+                            hideVariantsOnClickOutside
+                        )
+                    }, 10)
+                }
+
+                // 隐藏变体选择
+                function hideVariants() {
+                    const panel = document.getElementById('variantsPanel')
+                    if (panel) panel.remove()
+                    expandedVariant = null
+                    document.removeEventListener(
+                        'click',
+                        hideVariantsOnClickOutside
+                    )
+                }
+
+                function hideVariantsOnClickOutside(e) {
+                    // 排除所有工具按钮、下拉框和物品选择区域
+                    if (
+                        !e.target.closest('.variants-panel') &&
+                        !e.target.closest('.mat-btn') &&
+                        !e.target.closest('.brush-dropdown-content') &&
+                        !e.target.closest('#brushBtn') &&
+                        !e.target.closest('.sidebar-bg-category') &&
+                        !e.target.closest('#eraserBtn') &&
+                        !e.target.closest('#undoBtn') &&
+                        !e.target.closest('#deleteBtn') &&
+                        !e.target.closest('#clearBtn') &&
+                        !e.target.closest('#saveBtnHeader') &&
+                        !e.target.closest('#recordBtnHeader')
+                    ) {
+                        hideVariants()
+                        closeAllDropdowns()
+                    }
+                }
+
+                // 添加物品到画布
+                function addItemToCanvas(category, type, variantIndex) {
+                    closeAllDropdowns()
+                    disableBrushAndEraser()
+                    const itemsData = itemsConfig[category]?.items[type]
+                    if (!itemsData) return
+
+                    const variant = itemsData.variants[variantIndex]
+                    if (!variant) return
+
+                    const dragType = type.startsWith('child_') ? 'kid' : type
+                    const newItem = createDraggable(
+                        dragType,
+                        variant.img,
+                        variantIndex
+                    )
+                    const { w, h } = getSceneLayoutCssSize()
+                    const pos = clampPosition(newItem, w / 2 - 45, h / 2 - 45)
+                    setTransform(newItem, pos.x, pos.y, 1.0, 0)
+                    selectElementNoDisable(newItem)
+                }
+                // ===============================================
+
+                // 自动全屏
+                function autoFullscreen() {
+                    const elem = document.documentElement
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen().catch(() => {})
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen()
+                    } else if (elem.msRequestFullscreen) {
+                        elem.msRequestFullscreen()
+                    }
+                }
+
+                // 全屏切换
+
+                // 保存作品
+                function saveProject() {
+                    // 保存画布数据
+                    const drawData = drawCanvas.toDataURL('image/png')
+                    localStorage.setItem('drawingCanvas', drawData)
+
+                    // 保存背景设置
+                    localStorage.setItem('currentBg', currentBg)
+
+                    // 保存物品数据
+                    const items = []
+                    scene.querySelectorAll('.draggable').forEach((el) => {
+                        const img = el.querySelector('img')
+                        if (img && img.src) {
+                            const { tx, ty, scale, rotate } = getTransform(el)
+                            items.push({
+                                src: img.src,
+                                type: el.dataset.type,
+                                tx,
+                                ty,
+                                scale,
+                                rotate,
+                            })
+                        }
+                    })
+                    localStorage.setItem('sceneItems', JSON.stringify(items))
+
+                    console.log('作品已保存')
+                }
+
+                function bindUI() {
+                    // 缩略图在展开分类时分批加载（见 hydrateCategoryThumbs），避免此处一次性预加载阻塞主线程
+                    const brushDropdownContent = document.getElementById(
+                        'brushDropdownContent'
+                    )
+                    brushDropdownContent
+                        .querySelectorAll('.color-swatch')
+                        .forEach((opt) => {
+                            opt.addEventListener('click', (e) => {
+                                e.stopPropagation()
+                                const color = opt.dataset.color
+                                if (color) {
+                                    brushColor = color
+                                    setBrushColor(color)
+                                    eraserEnabled = false
+                                    drawingEnabled = true
+                                    drawCanvas.classList.add('drawing-mode')
+                                    document
+                                        .getElementById('eraserBtn')
+                                        .classList.remove('active')
+                                    document
+                                        .getElementById('brushBtn')
+                                        .classList.add('active')
+                                    updateInteractionLock()
+                                    updateCursor()
+                                    brushDropdownContent.classList.remove(
+                                        'show'
+                                    )
+                                }
+                            })
+                        })
+                    brushDropdownContent
+                        .querySelectorAll('.size-btn')
+                        .forEach((opt) => {
+                            opt.addEventListener('click', (e) => {
+                                e.stopPropagation()
+                                const size = parseInt(opt.dataset.size)
+                                if (size) {
+                                    brushSize = size
+                                    setBrushSize(size)
+                                    updateCursor()
+                                    brushDropdownContent.classList.remove(
+                                        'show'
+                                    )
+                                }
+                            })
+                        })
+
+                    // 下拉框点击事件 - 点击下拉框本身时关闭
+                    brushDropdownContent.addEventListener('click', (e) => {
+                        // 如果点击的是选项，选项自己的事件处理器会处理
+                        // 这里只处理点击下拉框空白区域的情况，让它关闭下拉框
+                        if (
+                            !e.target.closest('.color-swatch') &&
+                            !e.target.closest('.size-btn')
+                        ) {
+                            e.stopPropagation()
+                            brushDropdownContent.classList.remove('show')
+                        }
+                    })
+
+                    // 画笔按钮点击事件
+                    document
+                        .getElementById('brushBtn')
+                        .addEventListener('click', (e) => {
+                            e.stopPropagation()
+                            const isOpen =
+                                brushDropdownContent.classList.contains('show')
+                            closeAllDropdowns()
+                            if (!isOpen) {
+                                // 激活画笔模式
+                                eraserEnabled = false
+                                drawingEnabled = true
+                                drawCanvas.classList.add('drawing-mode')
+                                document
+                                    .getElementById('eraserBtn')
+                                    .classList.remove('active')
+                                document
+                                    .getElementById('brushBtn')
+                                    .classList.add('active')
+                                clearSelection() // 取消物品选择
+                                updateInteractionLock()
+                                updateCursor()
+                                brushDropdownContent.classList.add('show')
+                            }
+                        })
+                    const eraserDropdownContent = document.getElementById(
+                        'eraserDropdownContent'
+                    )
+                    document
+                        .getElementById('eraserBtn')
+                        .addEventListener('click', (e) => {
+                            e.stopPropagation()
+                            const isOpen =
+                                eraserDropdownContent &&
+                                eraserDropdownContent.classList.contains('show')
+                            closeAllDropdowns()
+                            if (!isOpen) {
+                                drawingEnabled = false
+                                eraserEnabled = true
+                                drawCanvas.classList.add('drawing-mode')
+                                document
+                                    .getElementById('eraserBtn')
+                                    .classList.add('active')
+                                document
+                                    .getElementById('brushBtn')
+                                    .classList.remove('active')
+                                clearSelection()
+                                updateInteractionLock()
+                                updateCursor()
+                                eraserDropdownContent.classList.add('show')
+                            }
+                        })
+                    if (eraserDropdownContent) {
+                        eraserDropdownContent
+                            .querySelectorAll('.eraser-size-btn')
+                            .forEach((opt) => {
+                                opt.addEventListener('click', (e) => {
+                                    e.stopPropagation()
+                                    const size = parseInt(opt.dataset.size, 10)
+                                    if (size) {
+                                        setEraserSize(size)
+                                        drawingEnabled = false
+                                        eraserEnabled = true
+                                        drawCanvas.classList.add('drawing-mode')
+                                        document
+                                            .getElementById('eraserBtn')
+                                            .classList.add('active')
+                                        document
+                                            .getElementById('brushBtn')
+                                            .classList.remove('active')
+                                        clearSelection()
+                                        updateInteractionLock()
+                                        eraserDropdownContent.classList.remove(
+                                            'show'
+                                        )
+                                    }
+                                })
+                            })
+                        eraserDropdownContent.addEventListener('click', (e) => {
+                            if (!e.target.closest('.eraser-size-btn')) {
+                                e.stopPropagation()
+                                eraserDropdownContent.classList.remove('show')
+                            }
+                        })
+                    }
+                    const undoBtnEl = document.getElementById('undoBtn')
+                    if (undoBtnEl)
+                        undoBtnEl.addEventListener('click', undoScene)
+                    document
+                        .getElementById('saveBtnHeader')
+                        .addEventListener('click', saveImage)
+                    document
+                        .getElementById('recordBtnHeader')
+                        .addEventListener('click', function (e) {
+                            e.stopPropagation()
+                            toggleSceneRecording()
+                        })
+                    document
+                        .getElementById('deleteBtn')
+                        .addEventListener('click', deleteSelected)
+                    const clearBtnEl = document.getElementById('clearBtn')
+                    if (clearBtnEl)
+                        clearBtnEl.addEventListener('click', clearScene)
+
+                    // 设置默认背景选中状态
+                    setBackground('cream')
+
+                    scene.addEventListener('click', (e) => {
+                        if (getItemAtPoint(e.clientX, e.clientY)) return
+                        clearSelection()
+                        closeAllDropdowns()
+                    })
+                    drawCanvas.addEventListener('mousedown', startDrawing)
+                    drawCanvas.addEventListener('mousemove', draw)
+                    drawCanvas.addEventListener('mouseup', stopDrawing)
+                    drawCanvas.addEventListener('mouseleave', stopDrawing)
+                    drawCanvas.addEventListener('touchstart', startDrawing, {
+                        passive: false,
+                    })
+                    drawCanvas.addEventListener('touchmove', draw, {
+                        passive: false,
+                    })
+                    drawCanvas.addEventListener('touchend', stopDrawing)
+                    drawCanvas.addEventListener('touchcancel', stopDrawing)
+                    scene.addEventListener('mousemove', moveCursor)
+                    scene.addEventListener('touchmove', moveCursor, {
+                        passive: false,
+                    })
+                    scene.addEventListener('mouseenter', () => {
+                        if (drawingEnabled || eraserEnabled)
+                            cursorDiv.style.display = 'block'
+                    })
+                    scene.addEventListener(
+                        'mouseleave',
+                        () => (cursorDiv.style.display = 'none')
+                    )
+
+                    const bgCategoryTitle =
+                        document.getElementById('bgCategoryTitle')
+                    const bgCategoryItems =
+                        document.getElementById('bgCategoryItems')
+                    if (bgCategoryTitle && bgCategoryItems) {
+                        bgCategoryTitle.addEventListener('click', (e) => {
+                            e.stopPropagation()
+                            const open =
+                                !bgCategoryTitle.classList.contains('expanded')
+                            bgCategoryTitle.classList.toggle('expanded', open)
+                            bgCategoryItems.classList.toggle('show', open)
+                        })
+                        bgCategoryItems
+                            .querySelectorAll('.mat-btn[data-bg]')
+                            .forEach((btn) => {
+                                btn.addEventListener('click', (e) => {
+                                    e.stopPropagation()
+                                    const k = btn.dataset.bg
+                                    if (k) setBackground(k)
+                                })
+                            })
+                    }
+                }
+
+                document.addEventListener('gesturestart', (e) =>
+                    e.preventDefault()
+                )
+                document.addEventListener('gesturechange', (e) =>
+                    e.preventDefault()
+                )
+            })()
+        </script>
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker
+                        .register('./sw.js')
+                        .catch(function () {})
+                })
+            }
+        </script>
+    </body>
+</html>
